@@ -17,3 +17,4 @@ vim.api.nvim_set_keymap('n', '<C-Left>', '<Cmd>call VSCodeNotify("editor.action.
 
 -- Вывод сообщения при загрузке файла с настройками клавиш
 vim.cmd([[autocmd VimEnter * lua print('keymaps загружен!')]])
+-- 

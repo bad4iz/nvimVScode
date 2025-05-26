@@ -52,15 +52,8 @@ end
 -- require "lazy_setup"
 -- require "polish"
 
-require('lazy').setup({
-  {
-    "kylechui/nvim-surround",
-    event = "VeryLazy",
-    config = function()
-        require("nvim-surround").setup({})
-    end
-}
-})
+-- Инициализация Lazy.nvim с загрузкой плагинов из user/windsurf/plugins
+require('lazy').setup('user.windsurf.plugins')
 
 -- Минимальная рабочая конфигурация Neovim
 

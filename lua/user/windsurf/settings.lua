@@ -18,3 +18,6 @@ end, { silent = true, desc = 'Найти слово под курсором в �
 vim.keymap.set('n', ' ', function()
     vscode.action('whichkey.show', { args = { query = vim.fn.expand('<cword>') } })
 end, { silent = true, desc = 'Показать ключи' })
+
+
+-- Загружаем конфигурацию MCP сервера Git

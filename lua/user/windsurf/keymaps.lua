@@ -1,9 +1,13 @@
--- Показ меню which-key при нажатии пробела в нормальном режиме
 -- В VS Code это меню отображает доступные команды с их хоткеями
 vim.api.nvim_set_keymap('n', '<Space>', '<Cmd>call VSCodeNotify("whichkey.show")<CR>', {noremap = true, silent = true})
 
 -- Горячая клавиша Space + e для переключения проводника (как в VSCode)
 vim.api.nvim_set_keymap('n', '<Space>e', '<Cmd>call VSCodeNotify("workbench.view.explorer")<CR>', {noremap = true, silent = true})
+
+-- Горячая клавиша Space + c для закрытия активного редактора (как в VSCode)
+vim.api.nvim_set_keymap('n', '<Space>c', '<Cmd>call VSCodeNotify("workbench.action.closeActiveEditor")<CR>', {noremap = true, silent = true})
+
+
 
 -- Горячая клавиша Ctrl+n для добавления следующего совпадения в выделение
 vim.api.nvim_set_keymap('n', '<C-n>', '<Cmd>call VSCodeNotify("editor.action.addSelectionToNextFindMatch")<CR>', {noremap = true, silent = true})
@@ -17,3 +21,4 @@ vim.api.nvim_set_keymap('n', '<C-Left>', '<Cmd>call VSCodeNotify("editor.action.
 
 -- Вывод сообщения при загрузке файла с настройками клавиш
 vim.cmd([[autocmd VimEnter * lua print('keymaps загружен!')]])
+-- 

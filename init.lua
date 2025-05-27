@@ -21,14 +21,6 @@
 =====================================================================
 ]]
 
--- Синхронизировать буфер обмена между ОС и Neovim.
---  Настройка откладывается до события `UiEnter`, так как это может увеличить время запуска.
---  Удалите эту опцию, если хотите, чтобы буфер обмена ОС оставался независимым.
---  См. `:help 'clipboard'`
-vim.schedule(function()
-  vim.o.clipboard = 'unnamedplus'
-end)
--- vim.opt.clipboard = "unnamedplus"
 
 
 -- This file simply bootstraps the installation of Lazy.nvim and then calls other files for execution
@@ -52,32 +44,17 @@ end
 -- require "lazy_setup"
 -- require "polish"
 
--- Инициализация Lazy.nvim с загрузкой плагинов из user/windsurf/plugins
-require('lazy').setup('user.windsurf.plugins')
 
 -- Минимальная рабочая конфигурация Neovim
 
--- Включаем нумерацию строк
-vim.wo.number = true
-vim.wo.relativenumber = true
-
--- Настройки табуляции
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-vim.opt.autoindent = true
-
--- Настройки поиска
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-vim.opt.hlsearch = true
 
 if vim.g.vscode then
+-- Инициализация Lazy.nvim с загрузкой плагинов из user/windsurf/plugins
     -- VSCode extension
     require "user.windsurf.init"
 else
     -- ordinary Neovim
+  require 'user.nvim'
 end
 
--- Сообщение при загрузке
--- vim.cmd([[autocmd VimEnter * lua print('Neovim загружен!')]])
+print("Конфигурация codeVSneovim загружена!")

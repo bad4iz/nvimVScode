@@ -7,6 +7,9 @@ require('lazy').setup('user.windsurf.plugins', {
   ui = {
     border = 'rounded',
   },
+  change_detection = {
+    notify = false
+  },
   performance = {
     rtp = {
       disabled_plugins = {
@@ -22,4 +25,8 @@ require('lazy').setup('user.windsurf.plugins', {
     },
   },
 })
+
 require 'user.windsurf.keymaps'
+
+
+print("Конфигурация Windsurf загружена!")

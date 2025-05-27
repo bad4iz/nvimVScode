@@ -1,3 +1,11 @@
+local keymap = vim.keymap.set
+local opts = { noremap = true, silent = true }
+
+-- remap leader key
+keymap("n", "<Space>", "", opts)
+
+local vscode = require('vscode')
+
 -- В VS Code это меню отображает доступные команды с их хоткеями
 vim.api.nvim_set_keymap('n', '<Space>', '<Cmd>call VSCodeNotify("whichkey.show")<CR>', {noremap = true, silent = true})
 
@@ -21,4 +29,15 @@ vim.api.nvim_set_keymap('n', '<C-Left>', '<Cmd>call VSCodeNotify("editor.action.
 
 -- Вывод сообщения при загрузке файла с настройками клавиш
 vim.cmd([[autocmd VimEnter * lua print('keymaps загружен!')]])
--- 
+
+
+-- Поиск слова под курсором в файлах проекта
+vim.keymap.set('n', '?', function()
+    vscode.action('workbench.action.findInFiles', { args = { query = vim.fn.expand('<cword>') } })
+end, { silent = true, desc = 'Найти слово под курсором в проекте' })
+
+
+
+-- vim.keymap.set('n', ' ', function()
+--     vscode.action('whichkey.show', { args = { query = vim.fn.expand('<cword>') } })
+-- end, { silent = true, desc = 'Показать ключи' })

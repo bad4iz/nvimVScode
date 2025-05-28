@@ -43,6 +43,10 @@ end
 
 -- require "lazy_setup"
 -- require "polish"
+require "user.common"
+
+
+
 
 
 -- Минимальная рабочая конфигурация Neovim
@@ -51,7 +55,7 @@ end
 if vim.g.vscode then
 -- Инициализация Lazy.nvim с загрузкой плагинов из user/windsurf/plugins
     -- VSCode extension
-    require "user.windsurf.init"
+    require "user.windsurf"
 else
     -- ordinary Neovim
   require 'user.nvim'

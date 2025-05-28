@@ -2,6 +2,7 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+
 -- Настройки для истории отмены
 if vim.fn.has('persistent_undo') == 1 then
     local undodir = vim.fn.stdpath('data') .. '/undo_history'

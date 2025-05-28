@@ -8,19 +8,19 @@ require('lazy').setup('user.windsurf.plugins', {
     border = 'rounded',
   },
   change_detection = {
-    notify = false
+    -- notify = false
   },
   performance = {
     rtp = {
       disabled_plugins = {
-        'gzip',
-        'matchit',
-        'matchparen',
-        'netrwPlugin',
-        'tarPlugin',
-        'tohtml',
-        'tutor',
-        'zipPlugin',
+        -- 'gzip',
+        -- 'matchit',
+        -- 'matchparen',
+        -- 'netrwPlugin',
+        -- 'tarPlugin',
+        -- 'tohtml',
+        -- 'tutor',
+        -- 'zipPlugin',
       },
     },
   },

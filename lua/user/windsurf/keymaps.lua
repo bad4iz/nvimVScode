@@ -5,25 +5,9 @@ local opts = {
 }
 
 -- remap leader key
-keymap("n", "<Space>", " ", opts)
 keymap("n", "<leader>", " ", opts)
 
 local vscode = require('vscode')
-
--- В VS Code это меню отображает доступные команды с их хоткеями
--- vim.api.nvim_set_keymap('n', '<Space>', '<Cmd>call VSCodeNotify("whichkey.show")<CR>', {noremap = true, silent = true})
-
--- Горячая клавиша Space + e для переключения проводника (как в VSCode)
-vim.api.nvim_set_keymap('n', '<Space>e', '<Cmd>call VSCodeNotify("workbench.view.explorer")<CR>', {
-    noremap = true,
-    silent = true
-})
-
--- Горячая клавиша Space + c для закрытия активного редактора (как в VSCode)
-vim.api.nvim_set_keymap('n', '<Space>c', '<Cmd>call VSCodeNotify("workbench.action.closeActiveEditor")<CR>', {
-    noremap = true,
-    silent = true
-})
 
 -- Горячая клавиша Ctrl+n для добавления следующего совпадения в выделение
 vim.api.nvim_set_keymap('n', '<C-n>', '<Cmd>call VSCodeNotify("editor.action.addSelectionToNextFindMatch")<CR>', {
@@ -41,14 +25,11 @@ vim.api.nvim_set_keymap('n', '<C-Left>', '<Cmd>call VSCodeNotify("editor.action.
 -- Примечание: В Neovim не нужно явно удалять привязки клавиш, как в keybindings.json VSCode
 -- Последняя привязка для комбинации клавиш имеет приоритет
 
--- Вывод сообщения при загрузке файла с настройками клавиш
-vim.cmd([[autocmd VimEnter * lua print('keymaps загружен!')]])
-
 -- //////////
 -- ## Find
 
 -- Поиск слова под курсором в файлах проекта
-keymap.set('n', '<Space>fc', function()
+keymap('n', '<leader>fc', function()
     vscode.action('workbench.action.findInFiles', {
         args = {
             query = vim.fn.expand('<cword>')
@@ -59,7 +40,7 @@ end, {
     desc = 'Найти слово под курсором в проекте'
 })
 
-keymap.set('n', '<Space>fw', function()
+keymap('n', '<leader>fw', function()
     vscode.action('workbench.action.findInFiles', {
         args = {}
     })
@@ -68,12 +49,8 @@ end, {
     desc = 'Найти слово'
 })
 
-vim.keymap.set('n', '<Space>ff', function()
-    vscode.action('workbench.action.quickOpen', {
-        args = {
-            query = vim.fn.expand('<cword>')
-        }
-    })
+keymap('n', '<leader>ff', function()
+    vscode.action('workbench.action.quickOpen', {})
 end, {
     silent = true,
     desc = 'Открыть файл'
@@ -103,24 +80,56 @@ end, {
 -- keymap({"n", "v"}, "<leader>ha", "<cmd>lua require('vscode').action('vscode-harpoon.addEditor')<CR>")
 
 -- Переключение табов
-keymap({"n", "v"}, "<Tab>", function()
-    vscode.action('workbench.action.nextEditor')
-end, {
-    silent = true,
-    desc = 'Следующая вкладка'
-})
+-- keymap({"n", "v"}, "<Tab>", function()
+--     vscode.action('workbench.action.nextEditor')
+-- end, 
+--     silent = true,
+--     desc = 'Следующая вкладка'
+-- })
 
-keymap({"n", "v"}, "<S-Tab>", function()
-    vscode.action('workbench.action.previousEditor')
-end, {
-    silent = true,
-    desc = 'Предыдущая вкладка'
-})
+-- keymap({"n", "v"}, "<S-Tab>", function()
+--     vscode.action('workbench.action.previousEditor')
+-- end, {
+--     silent = true,
+--     desc = 'Предыдущая вкладка'
+-- })
 
 -- Основные хоткеи
-keymap({"n", "v"}, "<leader>t", "<cmd>lua require('vscode').action('workbench.action.terminal.toggleTerminal')<CR>", {
+
+-- ===========================================================================
+-- РАБОТА С ТЕРМИНАЛОМ
+-- ===========================================================================
+-- Основные команды для работы с интегрированным терминалом VSCode
+-- Используйте leader t в качестве префикса для всех команд терминала
+keymap({"n", "v"}, "<leader>tt", "<cmd>lua require('vscode').action('workbench.action.terminal.toggleTerminal')<CR>", {
     silent = true,
-    desc = 'Переключить встроенный терминал'
+    desc = 'Показать/скрыть терминал (toggle)'
+})
+
+keymap({"n", "v"}, "<leader>tn", "<cmd>lua require('vscode').action('workbench.action.terminal.new')<CR>", {
+    silent = true,
+    desc = 'Новый терминал (new)'
+})
+
+keymap({"n", "v"}, "<leader>tk", "<cmd>lua require('vscode').action('workbench.action.terminal.kill')<CR>", {
+    silent = true,
+    desc = 'Закрыть терминал (kill)'
+})
+
+keymap({"n", "v"}, "<leader>t\"", "<cmd>lua require('vscode').action('workbench.action.terminal.split')<CR>", {
+    silent = true,
+    desc = 'Разделить терминал (split)'
+})
+
+keymap({"n", "v"}, "<leader>t\'\'", "<cmd>lua require('vscode').action('workbench.action.terminal.split')<CR>", {
+    silent = true,
+    desc = 'Разделить терминал (split)'
+})
+
+-- Отключаем Ctrl+g (аналог отключения в VS Code с префиксом -)
+keymap('n', '<C-g>', '<Nop>', {
+    silent = true,
+    desc = 'Отключено (был переход к строке)'
 })
 
 keymap({"n", "v"}, "<leader>b", "<cmd>lua require('vscode').action('editor.debug.action.toggleBreakpoint')<CR>", {
@@ -136,6 +145,11 @@ keymap({"n", "v"}, "<leader>d", "<cmd>lua require('vscode').action('editor.actio
 keymap({"n", "v"}, "<leader>a", "<cmd>lua require('vscode').action('editor.action.quickFix')<CR>", {
     silent = true,
     desc = 'Быстрое исправление (quick fix)'
+})
+
+keymap({"n", "v"}, "<leader>lr", "<cmd>lua require('vscode').action('editor.action.changeAll')<CR>", {
+    silent = true,
+    desc = 'Заменить все вхождения (change all)'
 })
 
 keymap({"n", "v"}, "<leader>sp", "<cmd>lua require('vscode').action('workbench.actions.view.problems')<CR>", {
@@ -163,7 +177,62 @@ keymap({"n", "v"}, "<leader>pr", "<cmd>lua require('vscode').action('code-runner
     desc = 'Запустить код (Code Runner)'
 })
 
--- keymap({"n", "v"}, "<leader>fd", "<cmd>lua require('vscode').action('editor.action.formatDocument')<CR>", {
---     silent = true,
---     desc = 'Форматировать документ'
--- })
+-- ========================================================================= --
+-- =============================== НАВИГАЦИЯ ============================== --
+-- ========================================================================= --
+
+-- Переход к строке
+keymap('n', 'g l', "<cmd>lua require('vscode').action('workbench.action.gotoLine')<CR>", {
+    silent = true,
+    desc = 'Перейти к строке'
+})
+
+-- Навигация по файлам
+keymap({"n", "v"}, "<leader>e", "<Cmd>call VSCodeNotify(\"workbench.view.explorer\")<CR>", {
+    noremap = true,
+    silent = true,
+    desc = 'Показать проводник'
+})
+
+-- Закрытие активного редактора
+keymap({"n", "v"}, "<leader>c", "<Cmd>call VSCodeNotify(\"workbench.action.closeActiveEditor\")<CR>", {
+    noremap = true,
+    silent = true,
+    desc = 'Закрыть активный редактор'
+})
+
+-- Поиск в проекте
+keymap('n', '<leader>fc', function()
+    vscode.action('workbench.action.findInFiles', {
+        args = {
+            query = vim.fn.expand('<cword>')
+        }
+    })
+end, {
+    silent = true,
+    desc = 'Найти слово под курсором в проекте'
+})
+
+-- Быстрый поиск файлов
+keymap({"n", "v"}, "<leader>ff", "<cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>", {
+    silent = true,
+    desc = 'Быстрый поиск файлов'
+})
+
+-- Показать палитру команд
+keymap({"n", "v"}, "<leader>cp", "<cmd>lua require('vscode').action('workbench.action.showCommands')<CR>", {
+    silent = true,
+    desc = 'Показать палитру команд'
+})
+
+-- Переопределение Ctrl+R для открытия недавних файлов
+keymap('n', '<leader>fo', '<Cmd>call VSCodeNotify("workbench.action.quickOpenRecent")<CR>', {
+    silent = true,
+    desc = 'Открыть недавние файлы'
+})
+
+-- ========================================================================= --
+-- ======================= НИЖЕ НЕ РЕДАКТИРОВАТЬ ======================= --
+-- ========================================================================= --
+
+print("Конфигурация клавиш загружена!")

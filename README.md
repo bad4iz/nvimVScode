@@ -18,11 +18,11 @@
 ## Установка
 
 1. Клонируйте репозиторий в директорию конфигурации Neovim:
-   ```bash
-   git clone https://github.com/yourusername/nvim-config.git ~/.config/nvim
+   ```powershell
+   git clone git@github.com:bad4iz/nvimVScode.git "$env:LOCALAPPDATA\nvim"
    ```
 
-2. Запустите Neovim и дождитесь установки плагинов
+3. Запустите Neovim и дождитесь установки плагинов
 
 ## Ключевые особенности для Windsurf/VSCode
 

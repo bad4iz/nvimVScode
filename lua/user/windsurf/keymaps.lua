@@ -142,7 +142,7 @@ keymap({"n", "v"}, "<leader>d", "<cmd>lua require('vscode').action('editor.actio
     desc = 'Показать документацию (hover)'
 })
 
-keymap({"n", "v"}, "<leader>a", "<cmd>lua require('vscode').action('editor.action.quickFix')<CR>", {
+keymap({"n", "v"}, "<leader>la", "<cmd>lua require('vscode').action('editor.action.quickFix')<CR>", {
     silent = true,
     desc = 'Быстрое исправление (quick fix)'
 })
@@ -152,7 +152,7 @@ keymap({"n", "v"}, "<leader>lr", "<cmd>lua require('vscode').action('editor.acti
     desc = 'Заменить все вхождения (change all)'
 })
 
-keymap({"n", "v"}, "<leader>sp", "<cmd>lua require('vscode').action('workbench.actions.view.problems')<CR>", {
+keymap({"n", "v"}, "<leader>ld", "<cmd>lua require('vscode').action('workbench.actions.view.problems')<CR>", {
     silent = true,
     desc = 'Показать проблемы (problems)'
 })
@@ -162,10 +162,6 @@ keymap({"n", "v"}, "<leader>cn", "<cmd>lua require('vscode').action('notificatio
     desc = 'Очистить уведомления'
 })
 
-keymap({"n", "v"}, "<leader>ff", "<cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>", {
-    silent = true,
-    desc = 'Быстрый поиск файлов'
-})
 
 keymap({"n", "v"}, "<leader>cp", "<cmd>lua require('vscode').action('workbench.action.showCommands')<CR>", {
     silent = true,
@@ -188,10 +184,22 @@ keymap('n', 'g l', "<cmd>lua require('vscode').action('workbench.action.gotoLine
 })
 
 -- Навигация по файлам
-keymap({"n", "v"}, "<leader>e", "<Cmd>call VSCodeNotify(\"workbench.view.explorer\")<CR>", {
-    noremap = true,
+vim.keymap.set('n', '<leader>o', function()
+    vscode.action('workbench.view.explorer')
+end, {
     silent = true,
     desc = 'Показать проводник'
+})
+
+
+
+-- Навигация по файлам
+vim.keymap.set({"n", "v"}, "<leader>e", function()
+    vscode.action('workbench.view.explorer', {
+        args = {}
+    })
+end, {
+    desc = 'Показать/скрыть проводник или вернуться в редактор'
 })
 
 -- Закрытие активного редактора
@@ -213,11 +221,6 @@ end, {
     desc = 'Найти слово под курсором в проекте'
 })
 
--- Быстрый поиск файлов
-keymap({"n", "v"}, "<leader>ff", "<cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>", {
-    silent = true,
-    desc = 'Быстрый поиск файлов'
-})
 
 -- Показать палитру команд
 keymap({"n", "v"}, "<leader>cp", "<cmd>lua require('vscode').action('workbench.action.showCommands')<CR>", {
@@ -225,10 +228,26 @@ keymap({"n", "v"}, "<leader>cp", "<cmd>lua require('vscode').action('workbench.a
     desc = 'Показать палитру команд'
 })
 
--- Переопределение Ctrl+R для открытия недавних файлов
-keymap('n', '<leader>fo', '<Cmd>call VSCodeNotify("workbench.action.quickOpenRecent")<CR>', {
+-- Переопределение Ctrl+R для открытия недавних проектов
+keymap('n', '<leader>fp', '<Cmd>call VSCodeNotify("workbench.action.quickOpenRecent")<CR>', {
     silent = true,
-    desc = 'Открыть недавние файлы'
+    desc = 'Открыть недавние проекты'
+})
+
+-- Сортировка выделения
+vim.keymap.set('v', 'gs', ':sort<CR>', { desc = 'Sort' })
+
+-- Переход к ошибкам (VSCode markers)
+keymap('n', 'ge', function()
+    vim.fn.VSCodeNotify("editor.action.marker.next")
+end, {
+    desc = 'next error'
+})
+
+keymap('n', 'gE', function()
+    vim.fn.VSCodeNotify("editor.action.marker.prev")
+end, {
+    desc = 'prev error'
 })
 
 -- ========================================================================= --

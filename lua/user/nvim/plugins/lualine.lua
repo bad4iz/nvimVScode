@@ -65,7 +65,7 @@ return {
     return {
       options = {
         theme = "tokyonight",
-        globalstatus = true,
+        globalstatus = false,
         disabled_filetypes = {
           statusline = { "dashboard", "alpha", "starter" },
           winbar = {},
@@ -101,7 +101,6 @@ return {
         lualine_b = {
           {
             "branch",
-            icon = "",
           },
           {
             "diff",
@@ -119,7 +118,6 @@ return {
             "diagnostics",
             sources = { "nvim_diagnostic" },
             symbols = {
-               error = '', warn = '', info = '', hint = ''
               error = " ",
               warn = " ",
               info = "󰋼 ",

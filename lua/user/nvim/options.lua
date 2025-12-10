@@ -30,7 +30,7 @@ if vim.g.neovide then
   vim.g.neovide_cursor_trail_length = 0.3
   vim.g.neovide_refresh_rate = 60
   vim.g.neovide_remember_window_size = true
-  vim.o.guifont = "JetBrainsMono Nerd Font:h12"
+  vim.o.guifont = "VictorMono Nerd Font Propo:h12"
 end
 
 -- =====================================================================
@@ -39,6 +39,12 @@ end
 opt.foldcolumn = "1"
 opt.foldlevel = 99
 opt.foldlevelstart = 99
+
+-- =====================================================================
+-- СТАТУСНАЯ СТРОКА И ТАБЫ
+-- =====================================================================
+opt.laststatus = 3     -- Глобальная статусная строка (для lualine)
+opt.showtabline = 2    -- Всегда показывать строку табов (для bufferline)
 
 -- =====================================================================
 -- ПРОИЗВОДИТЕЛЬНОСТЬ

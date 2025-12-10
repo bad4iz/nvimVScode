@@ -88,8 +88,6 @@ return {
       -- Провайдеры по умолчанию
       default = { "lsp", "path", "snippets", "buffer" },
       
-      -- Включить cmdline автодополнение
-      cmdline = {},
       
       -- Настройки провайдеров
       providers = {
@@ -151,7 +149,10 @@ return {
       -- Список элементов
       list = {
         -- Автоматически выбирать первый элемент
-        selection = "auto_insert",
+        selection = {
+          preselect = true,
+          auto_insert = true,
+        },
       },
       
       -- Меню

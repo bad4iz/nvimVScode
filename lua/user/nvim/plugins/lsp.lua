@@ -52,46 +52,6 @@ return {
     },
     
     opts = {
-      -- Диагностика
-      diagnostics = {
-        underline = true,
-        update_in_insert = false,
-        virtual_text = {
-          spacing = 4,
-          source = "if_many",
-          prefix = "●",
-          -- Красивые иконки для диагностики
-          format = function(diagnostic)
-            local icons = {
-              [vim.diagnostic.severity.ERROR] = "",
-              [vim.diagnostic.severity.WARN] = "",
-              [vim.diagnostic.severity.INFO] = "",
-              [vim.diagnostic.severity.HINT] = "",
-            }
-            local icon = icons[diagnostic.severity] or "●"
-            return icon .. " " .. diagnostic.message
-          end,
-        },
-        severity_sort = true,
-        signs = {
-          text = {
-            [vim.diagnostic.severity.ERROR] = "",
-            [vim.diagnostic.severity.WARN] = "",
-            [vim.diagnostic.severity.HINT] = "",
-            [vim.diagnostic.severity.INFO] = "",
-          },
-          numhl = {
-            [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
-            [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
-            [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
-            [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
-          },
-          linehl = {
-            [vim.diagnostic.severity.ERROR] = "DiagnosticUnnecessary",
-          },
-        },
-      },
-      
       -- Включить inlay hints (если сервер поддерживает)
       inlay_hints = {
         enabled = true,
@@ -210,8 +170,7 @@ return {
     },
     
     config = function(_, opts)
-      -- Настройка диагностики
-      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
+      -- Диагностика настроена в user.nvim.options
       
       -- Возможности клиента с blink.cmp
       local capabilities = vim.tbl_deep_extend(
@@ -260,6 +219,16 @@ return {
         map("<leader>ld", vim.diagnostic.open_float, "Диагностика строки")
         map("[d", vim.diagnostic.goto_prev, "Предыдущая ошибка")
         map("]d", vim.diagnostic.goto_next, "Следующая ошибка")
+        
+        -- Переключение виртуального текста диагностики
+        map("<leader>uv", function()
+          local current = vim.diagnostic.config().virtual_text
+          vim.diagnostic.config({ virtual_text = not current })
+          vim.notify(
+            "Virtual text: " .. (current and "OFF" or "ON"),
+            vim.log.levels.INFO
+          )
+        end, "Toggle virtual text")
         
         -- Форматирование
         map("<leader>lf", function()

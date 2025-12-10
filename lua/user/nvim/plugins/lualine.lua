@@ -119,14 +119,12 @@ return {
             "diagnostics",
             sources = { "nvim_diagnostic" },
             symbols = {
+               error = '', warn = '', info = '', hint = ''
               error = " ",
               warn = " ",
-              info = " ",
-              hint = " ",
+              info = "󰋼 ",
+              hint = "󰌵 ",
             },
-            colored = true,
-            update_in_insert = false,
-            always_visible = false,
           },
           { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
           {

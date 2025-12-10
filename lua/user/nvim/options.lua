@@ -78,4 +78,68 @@ opt.wildignore:append({
   "*.jpg", "*.jpeg", "*.png", "*.gif", "*.svg",
 })
 
+-- =====================================================================
+-- ДИАГНОСТИКА (иконки ошибок, предупреждений и т.д.)
+-- =====================================================================
+-- Настраиваем здесь, чтобы иконки применялись сразу при старте
+local icons = {
+   error = '', warn = ' ', info = ' ', hint = ' '
+}
+
+vim.diagnostic.config({
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+  
+  -- Виртуальный текст справа от кода
+  virtual_text = {
+    spacing = 4,
+    source = "if_many",
+    prefix = function(diagnostic)
+      local severity_icons = {
+        [vim.diagnostic.severity.ERROR] = icons.error,
+        [vim.diagnostic.severity.WARN] = icons.warn,
+        [vim.diagnostic.severity.HINT] = icons.hint,
+        [vim.diagnostic.severity.INFO] = icons.info,
+      }
+      return severity_icons[diagnostic.severity] or "● "
+    end,
+  },
+  
+  -- Иконки в колонке знаков (слева от номеров строк)
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = icons.error,
+      [vim.diagnostic.severity.WARN] = icons.warn,
+      [vim.diagnostic.severity.HINT] = icons.hint,
+      [vim.diagnostic.severity.INFO] = icons.info,
+    },
+  },
+  
+  -- Плавающее окно диагностики
+  float = {
+    focusable = true,
+    style = "minimal",
+    border = "rounded",
+    source = true,
+    header = "",
+    prefix = function(diagnostic)
+      local severity_icons = {
+        [vim.diagnostic.severity.ERROR] = icons.error,
+        [vim.diagnostic.severity.WARN] = icons.warn,
+        [vim.diagnostic.severity.HINT] = icons.hint,
+        [vim.diagnostic.severity.INFO] = icons.info,
+      }
+      local severity_names = {
+        [vim.diagnostic.severity.ERROR] = "Error",
+        [vim.diagnostic.severity.WARN] = "Warn",
+        [vim.diagnostic.severity.HINT] = "Hint",
+        [vim.diagnostic.severity.INFO] = "Info",
+      }
+      return severity_icons[diagnostic.severity] or "● ", 
+             "DiagnosticSign" .. (severity_names[diagnostic.severity] or "")
+    end,
+  },
+})
+
 print("✓ Дополнительные настройки nvim загружены")

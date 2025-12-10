@@ -1,0 +1,411 @@
+--[[
+=====================================================================
+                          LSP CONFIG
+=====================================================================
+Конфигурация Language Server Protocol для умной работы с кодом.
+
+Возможности:
+  - Автодополнение
+  - Переход к определению
+  - Поиск ссылок
+  - Рефакторинг
+  - Диагностика ошибок
+
+Горячие клавиши:
+  gd          - перейти к определению
+  gD          - перейти к объявлению
+  gr          - найти ссылки
+  gI          - перейти к реализации
+  K           - показать документацию
+  <leader>la  - действия кода (code actions)
+  <leader>lr  - переименовать
+  <leader>lf  - форматировать
+  <leader>ld  - диагностика буфера
+  [d          - предыдущая ошибка
+  ]d          - следующая ошибка
+
+GitHub: https://github.com/neovim/nvim-lspconfig
+=====================================================================
+--]]
+
+return {
+  -- ═══════════════════════════════════════════════════════════════
+  -- NVIM-LSPCONFIG - Конфигурация LSP серверов
+  -- ═══════════════════════════════════════════════════════════════
+  {
+    "neovim/nvim-lspconfig",
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    
+    dependencies = {
+      -- Менеджер LSP серверов
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      
+      -- Улучшенные возможности для Lua (neovim конфигурация)
+      { "folke/neodev.nvim", opts = {} },
+      
+      -- Схемы для JSON
+      "b0o/schemastore.nvim",
+      
+      -- Индикатор прогресса LSP
+      { "j-hui/fidget.nvim", opts = {} },
+    },
+    
+    opts = {
+      -- Диагностика
+      diagnostics = {
+        underline = true,
+        update_in_insert = false,
+        virtual_text = {
+          spacing = 4,
+          source = "if_many",
+          prefix = "●",
+          -- Красивые иконки для диагностики
+          format = function(diagnostic)
+            local icons = {
+              [vim.diagnostic.severity.ERROR] = "",
+              [vim.diagnostic.severity.WARN] = "",
+              [vim.diagnostic.severity.INFO] = "",
+              [vim.diagnostic.severity.HINT] = "",
+            }
+            local icon = icons[diagnostic.severity] or "●"
+            return icon .. " " .. diagnostic.message
+          end,
+        },
+        severity_sort = true,
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN] = "",
+            [vim.diagnostic.severity.HINT] = "",
+            [vim.diagnostic.severity.INFO] = "",
+          },
+          numhl = {
+            [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
+            [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
+            [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
+            [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
+          },
+          linehl = {
+            [vim.diagnostic.severity.ERROR] = "DiagnosticUnnecessary",
+          },
+        },
+      },
+      
+      -- Включить inlay hints (если сервер поддерживает)
+      inlay_hints = {
+        enabled = true,
+      },
+      
+      -- Включить codelens (если сервер поддерживает)
+      codelens = {
+        enabled = false,
+      },
+      
+      -- Возможности клиента
+      capabilities = {},
+      
+      -- Серверы LSP
+      servers = {
+        -- ─────────────────────────────────────────────────────────
+        -- TypeScript / JavaScript
+        -- ─────────────────────────────────────────────────────────
+        ts_ls = {
+          enabled = false, -- Используем typescript-tools вместо этого
+        },
+        
+        -- ─────────────────────────────────────────────────────────
+        -- HTML
+        -- ─────────────────────────────────────────────────────────
+        html = {
+          filetypes = { "html", "templ" },
+        },
+        
+        -- ─────────────────────────────────────────────────────────
+        -- CSS / SCSS
+        -- ─────────────────────────────────────────────────────────
+        cssls = {},
+        
+        -- ─────────────────────────────────────────────────────────
+        -- Tailwind CSS
+        -- ─────────────────────────────────────────────────────────
+        tailwindcss = {
+          filetypes = { 
+            "html", "css", "scss", "javascript", "javascriptreact", 
+            "typescript", "typescriptreact", "vue", "svelte" 
+          },
+        },
+        
+        -- ─────────────────────────────────────────────────────────
+        -- JSON
+        -- ─────────────────────────────────────────────────────────
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require("schemastore").json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
+        
+        -- ─────────────────────────────────────────────────────────
+        -- YAML
+        -- ─────────────────────────────────────────────────────────
+        yamlls = {
+          settings = {
+            yaml = {
+              schemaStore = {
+                enable = false,
+                url = "",
+              },
+              schemas = require("schemastore").yaml.schemas(),
+            },
+          },
+        },
+        
+        -- ─────────────────────────────────────────────────────────
+        -- Lua (для Neovim конфигурации)
+        -- ─────────────────────────────────────────────────────────
+        lua_ls = {
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+              },
+              codeLens = {
+                enable = true,
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+              diagnostics = {
+                globals = { "vim" },
+              },
+            },
+          },
+        },
+        
+        -- ─────────────────────────────────────────────────────────
+        -- ESLint
+        -- ─────────────────────────────────────────────────────────
+        eslint = {
+          settings = {
+            workingDirectories = { mode = "auto" },
+          },
+        },
+        
+        -- ─────────────────────────────────────────────────────────
+        -- Emmet (для быстрого написания HTML)
+        -- ─────────────────────────────────────────────────────────
+        emmet_ls = {
+          filetypes = { 
+            "html", "css", "scss", "javascript", "javascriptreact",
+            "typescript", "typescriptreact", "vue", "svelte"
+          },
+        },
+      },
+      
+      -- Настройка серверов
+      setup = {},
+    },
+    
+    config = function(_, opts)
+      -- Настройка диагностики
+      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
+      
+      -- Возможности клиента с blink.cmp
+      local capabilities = vim.tbl_deep_extend(
+        "force",
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
+        opts.capabilities or {}
+      )
+      
+      -- Пытаемся добавить возможности blink.cmp
+      local has_blink, blink = pcall(require, "blink.cmp")
+      if has_blink then
+        capabilities = blink.get_lsp_capabilities(capabilities)
+      end
+      
+      -- Функция при подключении LSP к буферу
+      local on_attach = function(client, bufnr)
+        local map = function(keys, func, desc)
+          vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
+        end
+        
+        -- Навигация
+        map("gd", vim.lsp.buf.definition, "Определение")
+        map("gD", vim.lsp.buf.declaration, "Объявление")
+        map("gI", vim.lsp.buf.implementation, "Реализация")
+        map("gy", vim.lsp.buf.type_definition, "Тип")
+        
+        -- Используем snacks.picker для ссылок (если доступен)
+        map("gr", function()
+          if package.loaded["snacks"] then
+            Snacks.picker.lsp_references()
+          else
+            vim.lsp.buf.references()
+          end
+        end, "Ссылки")
+        
+        -- Документация
+        map("K", vim.lsp.buf.hover, "Документация")
+        map("<C-k>", vim.lsp.buf.signature_help, "Сигнатура")
+        
+        -- Действия
+        map("<leader>la", vim.lsp.buf.code_action, "Действия кода")
+        map("<leader>lr", vim.lsp.buf.rename, "Переименовать")
+        
+        -- Диагностика
+        map("<leader>ld", vim.diagnostic.open_float, "Диагностика строки")
+        map("[d", vim.diagnostic.goto_prev, "Предыдущая ошибка")
+        map("]d", vim.diagnostic.goto_next, "Следующая ошибка")
+        
+        -- Форматирование
+        map("<leader>lf", function()
+          vim.lsp.buf.format({ async = true })
+        end, "Форматировать")
+        
+        -- Inlay hints (если поддерживается)
+        if client.supports_method("textDocument/inlayHint") then
+          vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+        end
+      end
+      
+      -- Настраиваем mason-lspconfig
+      require("mason-lspconfig").setup({
+        ensure_installed = vim.tbl_keys(opts.servers or {}),
+        handlers = {
+          function(server_name)
+            local server = opts.servers[server_name] or {}
+            
+            -- Пропускаем отключённые серверы
+            if server.enabled == false then
+              return
+            end
+            
+            server.capabilities = vim.tbl_deep_extend(
+              "force",
+              {},
+              capabilities,
+              server.capabilities or {}
+            )
+            
+            server.on_attach = on_attach
+            
+            require("lspconfig")[server_name].setup(server)
+          end,
+        },
+      })
+    end,
+  },
+  
+  -- ═══════════════════════════════════════════════════════════════
+  -- MASON - Менеджер LSP серверов, линтеров, форматтеров
+  -- ═══════════════════════════════════════════════════════════════
+  {
+    "williamboman/mason.nvim",
+    cmd = "Mason",
+    build = ":MasonUpdate",
+    
+    opts = {
+      ui = {
+        icons = {
+          package_installed = "✓",
+          package_pending = "➜",
+          package_uninstalled = "✗",
+        },
+        border = "rounded",
+      },
+      
+      -- Автоматически устанавливать
+      ensure_installed = {
+        -- LSP серверы
+        "typescript-language-server",
+        "html-lsp",
+        "css-lsp",
+        "tailwindcss-language-server",
+        "json-lsp",
+        "yaml-language-server",
+        "lua-language-server",
+        "eslint-lsp",
+        "emmet-ls",
+        
+        -- Форматтеры
+        "prettier",
+        "stylua",
+        
+        -- Линтеры
+        "eslint_d",
+      },
+    },
+    
+    config = function(_, opts)
+      require("mason").setup(opts)
+      
+      -- Устанавливаем ensure_installed пакеты
+      local mr = require("mason-registry")
+      mr:on("package:install:success", function()
+        vim.defer_fn(function()
+          require("lazy.core.handler.event").trigger({
+            event = "FileType",
+            buf = vim.api.nvim_get_current_buf(),
+          })
+        end, 100)
+      end)
+      
+      local function ensure_installed()
+        for _, tool in ipairs(opts.ensure_installed or {}) do
+          local p = mr.get_package(tool)
+          if not p:is_installed() then
+            p:install()
+          end
+        end
+      end
+      
+      if mr.refresh then
+        mr.refresh(ensure_installed)
+      else
+        ensure_installed()
+      end
+    end,
+  },
+  
+  -- ═══════════════════════════════════════════════════════════════
+  -- TYPESCRIPT-TOOLS - Улучшенная поддержка TypeScript
+  -- ═══════════════════════════════════════════════════════════════
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+    
+    opts = {
+      settings = {
+        -- Раздельные параметры для ts и js
+        separate_diagnostic_server = true,
+        
+        -- Публиковать диагностику при вставке текста
+        publish_diagnostic_on = "insert_leave",
+        
+        -- Inlay hints
+        tsserver_file_preferences = {
+          includeInlayParameterNameHints = "all",
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+        },
+      },
+    },
+    
+    keys = {
+      { "<leader>lo", "<cmd>TSToolsOrganizeImports<cr>", desc = "Организовать импорты" },
+      { "<leader>ls", "<cmd>TSToolsSortImports<cr>", desc = "Сортировать импорты" },
+      { "<leader>lu", "<cmd>TSToolsRemoveUnused<cr>", desc = "Удалить неиспользуемое" },
+      { "<leader>lm", "<cmd>TSToolsAddMissingImports<cr>", desc = "Добавить импорты" },
+      { "<leader>lR", "<cmd>TSToolsRenameFile<cr>", desc = "Переименовать файл" },
+    },
+  },
+}

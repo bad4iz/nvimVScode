@@ -262,7 +262,7 @@ return {
             
             server.on_attach = on_attach
             
-            require("lspconfig")[server_name].setup(server)
+            vim.lsp.config(server_name, server)
           end,
         },
       })

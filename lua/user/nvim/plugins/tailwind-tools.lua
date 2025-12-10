@@ -46,7 +46,7 @@ return {
   opts = {
     -- Режим работы
     server = {
-      override = true, -- Переопределять LSP для tailwind
+      override = false, -- Отключить переопределение LSP (несовместимо с новым API)
       settings = {},
     },
     

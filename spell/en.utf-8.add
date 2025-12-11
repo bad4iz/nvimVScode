@@ -9,3 +9,10 @@ lua
 lsp
 cmp
 AstroNvim
+JSON
+SCSS
+YAML
+автодополнение
+JS
+линтер
+ESLint

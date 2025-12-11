@@ -25,6 +25,9 @@ return {
 
     -- Индикатор прогресса загрузки LSP в правом нижнем углу
     { "j-hui/fidget.nvim", opts = {} },
+
+    -- JSON Schema Store для YAML и JSON серверов
+    "b0o/schemastore.nvim",
   },
 
   config = function()
@@ -35,7 +38,7 @@ return {
       -- Показывать виртуальный текст справа от строки с ошибкой
       virtual_text = {
         prefix = "●", -- Символ перед текстом ошибки
-        spacing = 4,  -- Отступ от кода
+        spacing = 4, -- Отступ от кода
       },
       -- Показывать знаки в колонке слева (●, ▲ и т.д.)
       signs = true,
@@ -47,19 +50,19 @@ return {
       severity_sort = true,
       -- Настройка всплывающего окна с диагностикой
       float = {
-        border = "rounded",      -- Скруглённые углы окна
-        source = "always",       -- Всегда показывать источник (eslint, typescript и т.д.)
-        header = "",             -- Без заголовка
-        prefix = "",             -- Без префикса
+        border = "rounded", -- Скруглённые углы окна
+        source = "always", -- Всегда показывать источник (eslint, typescript и т.д.)
+        header = "", -- Без заголовка
+        prefix = "", -- Без префикса
       },
     })
 
     -- Иконки для разных типов диагностики в колонке знаков
     local signs = {
-      Error = " ", -- Ошибка
-      Warn = " ",  -- Предупреждение
-      Hint = "󰌵 ", -- Подсказка
-      Info = " ", -- Информация
+      Error = "", -- Ошибка
+      Warn = "", -- Предупреждение
+      Hint = "󰌵", -- Подсказка
+      Info = "", -- Информация
     }
     for type, icon in pairs(signs) do
       local hl = "DiagnosticSign" .. type
@@ -151,22 +154,22 @@ return {
       -- Диагностика (ошибки и предупреждения)
       -- ======================================================================
       -- gl или <Leader>ld - показать диагностику для текущей строки
-      map("gl", vim.diagnostic.open_float, "Диагностика строки")
       map("<Leader>ld", vim.diagnostic.open_float, "Диагностика строки")
 
       -- <Leader>lD - показать все ошибки в буфере
       map("<Leader>lD", "<cmd>Telescope diagnostics bufnr=0<cr>", "Диагностика буфера")
 
       -- [d - перейти к предыдущей ошибке/предупреждению
-      map("[d", vim.diagnostic.goto_prev, "Предыдущая ошибка")
+      map("gE", vim.diagnostic.goto_prev, "Предыдущая ошибка")
 
       -- ]d - перейти к следующей ошибке/предупреждению
-      map("]d", vim.diagnostic.goto_next, "Следующая ошибка")
+      map("ge", vim.diagnostic.goto_next, "Следующая ошибка")
 
       -- ]e / [e - навигация только по ошибкам (без предупреждений)
       map("]e", function()
         vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
       end, "Следующая ERROR")
+
       map("[e", function()
         vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
       end, "Предыдущая ERROR")
@@ -195,7 +198,7 @@ return {
           callback = vim.lsp.buf.document_highlight,
         })
         -- При движении курсора - убрать подсветку
-        vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        vim.api.nvim_create_autocmd({ "CursorMove f", "CursorMovedI" }, {
           buffer = bufnr,
           group = highlight_group,
           callback = vim.lsp.buf.clear_references,
@@ -257,9 +260,32 @@ return {
           },
         },
       },
+      -- ─────────────────────────────────────────────────────────
+      -- YAML
+      -- ─────────────────────────────────────────────────────────
+      yamlls = {
+        settings = {
+          yaml = {
+            schemaStore = {
+              enable = false,
+              url = "",
+            },
+            schemas = require("schemastore").yaml.schemas(),
+          },
+        },
+      },
 
-      -- JSON (package.json, tsconfig.json, .eslintrc.json и т.д.)
-      jsonls = {},
+      -- ─────────────────────────────────────────────────────────
+      -- JSON
+      -- ─────────────────────────────────────────────────────────
+      jsonls = {
+        settings = {
+          json = {
+            schemas = require("schemastore").json.schemas(),
+            validate = { enable = true },
+          },
+        },
+      },
 
       -- HTML
       html = {},
@@ -271,15 +297,50 @@ return {
       tailwindcss = {},
 
       -- ESLint (линтер для JS/TS)
-      eslint = {},
-
-      -- Emmet (быстрая разметка HTML/CSS)
+      eslint = {
+        settings = {
+          workingDirectories = { mode = "auto" },
+        },
+      },
+      -- ─────────────────────────────────────────────────────────
+      -- Emmet (для быстрого написания HTML)
+      -- ─────────────────────────────────────────────────────────
       emmet_ls = {
-        filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
+        filetypes = {
+          "html",
+          "css",
+          "scss",
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+          "vue",
+          "svelte",
+        },
       },
 
+      -- ─────────────────────────────────────────────────────────
       -- Markdown
-      marksman = {},
+      -- ─────────────────────────────────────────────────────────
+      marksman = {
+        filetypes = { "markdown", "markdown.mdx" },
+        -- Отключить диагностику (только автодополнение и навигация)
+        handlers = {
+          ["textDocument/publishDiagnostics"] = function() end,
+        },
+        settings = {
+          marksman = {
+            -- Включить автодополнение
+            completion = {
+              enabled = true,
+            },
+            -- Включить навигацию
+            references = {
+              enabled = true,
+            },
+          },
+        },
+      },
     }
 
     -- ========================================================================

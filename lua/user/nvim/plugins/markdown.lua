@@ -355,7 +355,7 @@ return {
           local bufnr = args.buf
 
           -- Отключить spell checking (может быть источником красных подчеркиваний)
-          vim.bo[bufnr].spell = false
+          vim.opt_local.spell = false
 
           -- Отключить диагностику для этого буфера
           vim.diagnostic.enable(false, { bufnr = bufnr })

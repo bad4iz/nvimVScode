@@ -151,14 +151,13 @@ return {
     -- Панель переключения между источниками
     source_selector = {
       winbar = true,              -- Показывать в winbar (верхняя панель окна)
-      statusline = false,         -- Не показывать в statusline
+      statusline = true,         -- Не показывать в statusline
       show_scrolled_off_parent_node = false,
 
       sources = {
         { source = "filesystem", display_name = " 󰉋 Files " },      -- Файлы
         { source = "buffers", display_name = " 󰈚 Buffers " },       -- Буферы
         { source = "git_status", display_name = " 󰊢 Git " },        -- Git
-        { source = "document_symbols", display_name = " 󰌗 Symbols " }, -- Символы
       },
 
       content_layout = "start",   -- Расположение: "start", "end", "center"

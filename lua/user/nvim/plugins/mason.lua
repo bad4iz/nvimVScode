@@ -30,8 +30,7 @@ return {
     },
     
     ensure_installed = {
-      -- LSP серверы
-      "vtsls",
+      -- LSP серверы (vtsls исключён - используется typescript-tools.nvim)
       "html-lsp",
       "css-lsp",
       "tailwindcss-language-server",
@@ -40,13 +39,12 @@ return {
       "lua-language-server",
       "eslint-lsp",
       "emmet-ls",
-      "sonarlint-language-server",
       "marksman", -- Markdown LSP
 
       -- Форматтеры (претиерд быстрее)
       "prettierd",
       "stylua",
-      
+
       -- Линтеры (демон для быстрой проверки)
       "eslint_d",
     },

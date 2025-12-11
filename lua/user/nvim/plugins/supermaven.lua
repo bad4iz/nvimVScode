@@ -1,143 +1,61 @@
 --[[
-=====================================================================
-                        SUPERMAVEN
-=====================================================================
-AI-помощник для автодополнения кода.
+  Supermaven AI - работает в ДВУХ режимах одновременно
 
-Особенности:
-  - Быстрое автодополнение на основе AI
-  - Работает локально (приватность)
-  - Поддержка множества языков
-  - Интеграция с blink.cmp
+  1. INLINE ПОДСКАЗКИ (серый #6e7681 + курсив):
+     - Показывает предложения справа от курсора
+     - Стиль GitHub Copilot - не отвлекает от кода
+     - Горячие клавиши:
+       • <C-y> - принять подсказку
+       • <C-Right> - принять слово
+       • <C-]> - очистить подсказку
 
-Горячие клавиши:
-  <Tab>       - принять предложение (если нет других)
-  <C-]>       - отменить предложение
-  <C-j>       - принять следующее слово
-  
-Команды:
-  :SupermavenStart    - запустить Supermaven
-  :SupermavenStop     - остановить Supermaven
-  :SupermavenRestart  - перезапустить
-  :SupermavenStatus   - показать статус
-  :SupermavenToggle   - включить/выключить
+  2. NVIM-CMP МЕНЮ (фиолетовый цвет #d787ff):
+     - Подсказки в меню автодополнения
+     - Легко сравнить с Codeium (бирюзовый) и LSP (обычный)
+     - Иконка: 󱙺 Supermaven (робот = AI помощник)
+     - Настроено в: lua/plugins/cmp.lua:24-27, 32
 
-GitHub: https://github.com/supermaven-inc/supermaven-nvim
-
-ПРИМЕЧАНИЕ: Supermaven был приобретён Cursor. Если плагин перестанет
-обновляться, рассмотрите альтернативы:
-  - codeium.nvim (бесплатный)
-  - minuet-ai.nvim (поддержка разных провайдеров)
-=====================================================================
+  ЦВЕТОВАЯ СХЕМА:
+  - Supermaven inline = СЕРЫЙ (#6e7681) + курсив (GitHub Copilot style)
+  - Supermaven в cmp = ФИОЛЕТОВЫЙ (#d787ff)
+  - Codeium в cmp = БИРЮЗОВЫЙ (#00d7af)
+  - LSP = обычный цвет
 --]]
-
 return {
   "supermaven-inc/supermaven-nvim",
-  event = "InsertEnter", -- Загружать при входе в Insert mode
-  
-  opts = {
-    -- ═══════════════════════════════════════════════════════════════
-    -- СОЧЕТАНИЯ КЛАВИШ
-    -- ═══════════════════════════════════════════════════════════════
-    keymaps = {
-      -- Принять всё предложение
-      accept_suggestion = "<Tab>",
-      -- Отменить предложение
-      clear_suggestion = "<C-]>",
-      -- Принять только следующее слово
-      accept_word = "<C-j>",
-    },
-    
-    -- ═══════════════════════════════════════════════════════════════
-    -- ИГНОРИРУЕМЫЕ ТИПЫ ФАЙЛОВ
-    -- ═══════════════════════════════════════════════════════════════
-    ignore_filetypes = {
-      -- Конфиденциальные файлы
-      "env",
-      "gitcommit",
-      "gitrebase",
-      
-      -- Файлы без кода
-      "help",
-      "markdown",
-      "text",
-      "TelescopePrompt",
-      "neo-tree",
-      "lazy",
-      "mason",
-    },
-    
-    -- ═══════════════════════════════════════════════════════════════
-    -- ЦВЕТ ПРЕДЛОЖЕНИЙ
-    -- ═══════════════════════════════════════════════════════════════
-    color = {
-      -- Цвет текста предложения (серый)
-      suggestion_color = "#585b70",
-      -- Цвет для терминалов без true color
-      cterm = 244,
-    },
-    
-    -- ═══════════════════════════════════════════════════════════════
-    -- ЛОГИРОВАНИЕ
-    -- ═══════════════════════════════════════════════════════════════
-    -- Уровни: "off", "error", "warn", "info", "debug", "trace"
-    log_level = "info",
-    
-    -- ═══════════════════════════════════════════════════════════════
-    -- ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ
-    -- ═══════════════════════════════════════════════════════════════
-    
-    -- Отключить inline completion (если используете только через blink.cmp)
-    disable_inline_completion = false,
-    
-    -- Отключить встроенные keymaps (для ручной настройки)
-    disable_keymaps = false,
-    
-    -- Условие для отключения Supermaven
-    -- Возвращает true = Supermaven отключен
-    condition = function()
-      -- Отключить в буферах без имени файла
-      local bufname = vim.fn.expand("%:t")
-      if bufname == "" then
-        return true
-      end
-      
-      -- Отключить для очень больших файлов (> 100KB)
-      local filesize = vim.fn.getfsize(vim.fn.expand("%:p"))
-      if filesize > 100 * 1024 then
-        return true
-      end
-      
-      return false
-    end,
-  },
-  
-  config = function(_, opts)
-    require("supermaven-nvim").setup(opts)
-    
-    -- Создаём команду для переключения
-    vim.api.nvim_create_user_command("SupermavenToggle", function()
-      local api = require("supermaven-nvim.api")
-      if api.is_running() then
-        api.stop()
-        vim.notify("Supermaven остановлен", vim.log.levels.INFO)
-      else
-        api.start()
-        vim.notify("Supermaven запущен", vim.log.levels.INFO)
-      end
-    end, { desc = "Переключить Supermaven" })
-    
-    -- Добавляем keymapping для переключения
-    vim.keymap.set("n", "<leader>ai", "<cmd>SupermavenToggle<cr>", { 
-      desc = "Переключить Supermaven" 
-    })
-    
-    -- Добавляем в statusline индикатор (опционально)
-    vim.api.nvim_create_autocmd("User", {
-      pattern = "SupermavenStatus",
+  config = function()
+    require("supermaven-nvim").setup {
+      keymaps = {
+        accept_suggestion = "<C-g>", -- Принять inline подсказку
+        clear_suggestion = "<C-]>", -- Очистить inline подсказку
+        accept_word = "<C-Right>", -- Принять слово
+      },
+      ignore_filetypes = {},
+      color = {
+        suggestion_color = "#d787ff", 
+        cterm = 244,
+      },
+      log_level = "off",
+      disable_inline_completion = false, -- false = inline включены
+      disable_keymaps = false,
+    }
+
+    -- Стиль inline подсказок: курсив + фиолетовый цвет
+    -- Применяем после загрузки плагина через autocmd
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      pattern = "*",
       callback = function()
-        -- Можно добавить обновление statusline
+        vim.api.nvim_set_hl(0, "SupermavenSuggestion", {
+          fg = "#d787ff",
+          italic = true,
+        })
       end,
+    })
+
+    -- Применяем сразу
+    vim.api.nvim_set_hl(0, "SupermavenSuggestion", {
+      fg = "#d787ff",
+      italic = true,
     })
   end,
 }

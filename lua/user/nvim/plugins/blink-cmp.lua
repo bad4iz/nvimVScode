@@ -10,6 +10,15 @@
   - Встроенная поддержка LSP
   - Автоматические скобки
 
+Источники автодополнения:
+  - LSP         - Language Server Protocol (приоритет: 100)
+  - Supermaven  - AI автодополнение (приоритет: 95)
+  - Codeium     - AI автодополнение (приоритет: 90)
+  - Snippets    - сниппеты через LuaSnip (приоритет: 85)
+  - Emoji       - эмодзи (приоритет: 5)
+  - Path        - пути к файлам (приоритет: 3)
+  - Buffer      - текущий буфер (приоритет: 1)
+
 Горячие клавиши:
   <C-Space>   - показать меню автодополнения
   <CR>        - подтвердить выбор
@@ -39,6 +48,21 @@ return {
       end,
     },
     "L3MON4D3/LuaSnip",
+
+    -- AI автодополнение
+    "supermaven-inc/supermaven-nvim",
+    "Exafunction/codeium.nvim",
+
+    -- Эмодзи
+    "hrsh7th/cmp-emoji",
+
+    -- Адаптер для совместимости с nvim-cmp источниками
+    {
+      "saghen/blink.compat",
+      version = "*",
+      lazy = true,
+      opts = {},
+    },
   },
   
   ---@module 'blink.cmp'
@@ -86,9 +110,8 @@ return {
     -- ═══════════════════════════════════════════════════════════════
     sources = {
       -- Провайдеры по умолчанию
-      default = { "lsp", "path", "snippets", "buffer" },
-      
-      
+      default = { "lsp", "path", "snippets", "buffer", "codeium", "supermaven", "emoji" },
+
       -- Настройки провайдеров
       providers = {
         lsp = {
@@ -108,14 +131,61 @@ return {
         snippets = {
           name = "Сниппеты",
           module = "blink.cmp.sources.snippets",
-          score_offset = 80,
+          score_offset = 85,
         },
         buffer = {
           name = "Буфер",
           module = "blink.cmp.sources.buffer",
           score_offset = 1,
         },
+
+        -- Codeium AI автодополнение
+        codeium = {
+          name = "Codeium",
+          module = "blink.compat.source",
+          score_offset = 90,
+          async = true,
+          transform_items = function(_, items)
+            -- Добавляем иконку для Codeium
+            for _, item in ipairs(items) do
+              item.kind = require("blink.cmp.types").CompletionItemKind.Codeium
+            end
+            return items
+          end,
+        },
+
+        -- Supermaven AI автодополнение
+        supermaven = {
+          name = "Supermaven",
+          module = "blink.compat.source",
+          score_offset = 95,
+          async = true,
+          transform_items = function(_, items)
+            -- Добавляем иконку для Supermaven
+            for _, item in ipairs(items) do
+              item.kind = require("blink.cmp.types").CompletionItemKind.Supermaven
+            end
+            return items
+          end,
+        },
+
+        -- Эмодзи
+        emoji = {
+          name = "Emoji",
+          module = "blink.compat.source",
+          score_offset = 5,
+          opts = {
+            insert = true, -- Вставлять эмодзи напрямую (не код)
+          },
+        },
       },
+    },
+
+    -- ═══════════════════════════════════════════════════════════════
+    -- SNIPPETS (включая LuaSnip)
+    -- ═══════════════════════════════════════════════════════════════
+    snippets = {
+      preset = "luasnip", -- Использовать LuaSnip как движок
     },
     
     -- ═══════════════════════════════════════════════════════════════
@@ -201,7 +271,11 @@ return {
                   Event = "",
                   Operator = "󰆕",
                   TypeParameter = "",
+                  -- AI автодополнение
                   Supermaven = "",
+                  Codeium = "",
+                  -- Эмодзи
+                  Emoji = "󰞅",
                 }
                 return (kind_icons[ctx.kind] or "󰉿") .. " "
               end,

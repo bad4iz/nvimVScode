@@ -3,6 +3,7 @@
                           SNACKS.NVIM
 =====================================================================
 Коллекция полезных утилит для Neovim от folke (автор lazy.nvim).
+Конфигурация в стиле AstroNvim.
 
 Включает:
   - Dashboard    : красивая стартовая страница
@@ -14,15 +15,28 @@
   - Zen          : режим фокусировки
   - и многое другое...
 
-Горячие клавиши (лидер = пробел):
+Горячие клавиши (лидер = пробел) в стиле AstroNvim:
   <leader>ff  - найти файлы
-  <leader>fg  - поиск по тексту (grep)
+  <leader>fF  - найти ВСЕ файлы (включая скрытые)
+  <leader>fg  - git файлы
+  <leader>fw  - поиск слов (grep)
+  <leader>fW  - поиск слов во ВСЕХ файлах
   <leader>fb  - буферы
-  <leader>fh  - история файлов
-  <leader>fr  - недавние файлы
-  <leader>/   - поиск в текущем буфере
-  <leader>:   - история команд
-  <leader>un  - скрыть уведомления
+  <leader>fo  - недавние файлы (old)
+  <leader>fO  - недавние файлы (cwd)
+  <leader>fc  - слово под курсором
+  <leader>fC  - команды
+  <leader>fh  - справка
+  <leader>fk  - горячие клавиши
+  <leader>fm  - man pages
+  <leader>fn  - уведомления
+  <leader>fr  - регистры
+  <leader>fs  - smart (буферы + recent + files)
+  <leader>ft  - темы (colorschemes)
+  <leader>fu  - undo history
+  <leader>f'  - marks
+  <leader>f<CR> - возобновить поиск
+  <leader>fa  - config files
 
 GitHub: https://github.com/folke/snacks.nvim
 =====================================================================
@@ -32,11 +46,11 @@ return {
   "folke/snacks.nvim",
   priority = 1000,
   lazy = false,
-  
+
   ---@type snacks.Config
   opts = {
     -- ═══════════════════════════════════════════════════════════════
-    -- DASHBOARD - Стартовая страница
+    -- DASHBOARD - Стартовая страница (AstroNvim style)
     -- ═══════════════════════════════════════════════════════════════
     dashboard = {
       enabled = true,
@@ -44,21 +58,21 @@ return {
       row = nil,
       col = nil,
       pane_gap = 4,
-      
+
       preset = {
-        -- Команды для пунктов меню
         keys = {
-          { icon = " ", key = "f", desc = "Найти файл", action = ":lua Snacks.picker.files()" },
-          { icon = " ", key = "n", desc = "Новый файл", action = ":ene | startinsert" },
-          { icon = " ", key = "g", desc = "Поиск текста", action = ":lua Snacks.picker.grep()" },
-          { icon = " ", key = "r", desc = "Недавние файлы", action = ":lua Snacks.picker.recent()" },
-          { icon = " ", key = "c", desc = "Конфигурация", action = ":lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })" },
-          { icon = " ", key = "s", desc = "Восстановить сессию", section = "session" },
-          { icon = "󰒲 ", key = "l", desc = "Lazy (плагины)", action = ":Lazy" },
-          { icon = " ", key = "q", desc = "Выход", action = ":qa" },
+          { icon = " ", key = "n", desc = "Новый файл", action = "<leader>n" },
+          { icon = " ", key = "f", desc = "Найти файл", action = "<leader>ff" },
+          { icon = " ", key = "o", desc = "Недавние файлы", action = "<leader>fo" },
+          { icon = " ", key = "w", desc = "Найти слово", action = "<leader>fw" },
+          { icon = " ", key = "'", desc = "Закладки", action = "<leader>f'" },
+          { icon = " ", key = "s", desc = "Последняя сессия", action = "<leader>Sl" },
+          { icon = " ", key = "c", desc = "Конфиг", action = "<leader>fa" },
+          { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
+          { icon = " ", key = "m", desc = "Mason", action = ":Mason" },
+          { icon = " ", key = "q", desc = "Выйти", action = ":qa" },
         },
-        
-        -- ASCII логотип
+
         header = [[
     ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
     ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
@@ -68,21 +82,20 @@ return {
     ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝
         ]],
       },
-      
-      -- Секции дашборда
+
       sections = {
-        { section = "header" },
-        { section = "keys", gap = 1, padding = 1 },
+        { section = "header", padding = 2 },
+        { section = "keys", gap = 1, padding = 2 },
         { section = "startup" },
       },
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- NOTIFIER - Уведомления
     -- ═══════════════════════════════════════════════════════════════
     notifier = {
       enabled = true,
-      timeout = 3000,        -- Время показа (мс)
+      timeout = 3000,
       width = { min = 40, max = 0.4 },
       height = { min = 1, max = 0.6 },
       margin = { top = 0, right = 1, bottom = 0 },
@@ -95,58 +108,49 @@ return {
         debug = " ",
         trace = "✎ ",
       },
-      style = "compact",     -- compact, minimal, fancy
+      style = "compact",
       top_down = true,
       date_format = "%H:%M",
       more_format = " (+%d)",
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
-    -- PICKER - Fuzzy Finder (основной)
+    -- PICKER - Fuzzy Finder (AstroNvim style)
     -- ═══════════════════════════════════════════════════════════════
     picker = {
       enabled = true,
-      -- Источники по умолчанию
+      ui_select = true,
       sources = {},
-      -- Стиль окна
       layout = {
         cycle = true,
-        preset = "default", -- default, dropdown, ivy, select, cursor
+        preset = "default",
       },
-      -- Формат элементов
       formatters = {
         file = {
-          filename_first = true, -- Сначала имя файла, потом путь
+          filename_first = true,
         },
       },
-      -- Иконки
       icons = {
         files = {
           enabled = true,
         },
       },
-      -- Действия по умолчанию
-      actions = {
-        -- enter = "edit",
-        -- ctrl-s = "split",
-        -- ctrl-v = "vsplit",
-      },
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
-    -- INDENT - Направляющие отступов
+    -- INDENT - Направляющие отступов (AstroNvim style)
     -- ═══════════════════════════════════════════════════════════════
     indent = {
       enabled = true,
       indent = {
-        char = "│",
+        char = "▏",
         blank = " ",
         only_scope = false,
         only_current = false,
       },
       scope = {
         enabled = true,
-        char = "│",
+        char = "▏",
         underline = false,
         only_current = false,
       },
@@ -162,16 +166,10 @@ return {
         },
       },
       animate = {
-        enabled = true,
-        style = "out",
-        easing = "linear",
-        duration = {
-          step = 20,
-          total = 200,
-        },
+        enabled = false, -- AstroNvim отключает анимацию
       },
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- SCROLL - Плавная прокрутка
     -- ═══════════════════════════════════════════════════════════════
@@ -182,24 +180,24 @@ return {
         easing = "linear",
       },
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- WORDS - Подсветка слова под курсором
     -- ═══════════════════════════════════════════════════════════════
     words = {
       enabled = true,
-      debounce = 100,        -- Задержка перед подсветкой (мс)
+      debounce = 100,
       notify_jump = false,
       notify_end = true,
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- QUICKFILE - Быстрое открытие файлов
     -- ═══════════════════════════════════════════════════════════════
     quickfile = {
       enabled = true,
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- STATUSCOLUMN - Красивая колонка статуса
     -- ═══════════════════════════════════════════════════════════════
@@ -216,16 +214,16 @@ return {
       },
       refresh = 50,
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- LAZYGIT - Интеграция с lazygit
     -- ═══════════════════════════════════════════════════════════════
     lazygit = {
       enabled = true,
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
-    -- TERMINAL - Терминал
+    -- TERMINAL - Терминал (AstroNvim style)
     -- ═══════════════════════════════════════════════════════════════
     terminal = {
       enabled = true,
@@ -233,7 +231,7 @@ return {
         style = "terminal",
       },
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- INPUT - Красивый ввод
     -- ═══════════════════════════════════════════════════════════════
@@ -243,18 +241,42 @@ return {
       icon_pos = "left",
       prompt_pos = "title",
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
     -- BIGFILE - Оптимизация для больших файлов
     -- ═══════════════════════════════════════════════════════════════
     bigfile = {
       enabled = true,
       notify = true,
-      size = 1.5 * 1024 * 1024, -- 1.5 MB
+      size = 1.5 * 1024 * 1024,
     },
-    
+
     -- ═══════════════════════════════════════════════════════════════
-    -- STYLES - Стили для окон
+    -- ZEN - Режим фокусировки (AstroNvim style)
+    -- ═══════════════════════════════════════════════════════════════
+    zen = {
+      enabled = true,
+      toggles = {
+        dim = false,
+        diagnostics = false,
+        inlay_hints = false,
+      },
+      win = {
+        width = function() return math.min(120, math.floor(vim.o.columns * 0.75)) end,
+        height = 0.9,
+        backdrop = { transparent = false },
+        wo = {
+          number = false,
+          relativenumber = false,
+          signcolumn = "no",
+          foldcolumn = "0",
+          list = false,
+        },
+      },
+    },
+
+    -- ═══════════════════════════════════════════════════════════════
+    -- STYLES
     -- ═══════════════════════════════════════════════════════════════
     styles = {
       notification = {
@@ -262,96 +284,176 @@ return {
       },
     },
   },
-  
+
   -- ═══════════════════════════════════════════════════════════════
-  -- ГОРЯЧИЕ КЛАВИШИ
+  -- ГОРЯЧИЕ КЛАВИШИ (AstroNvim style)
   -- ═══════════════════════════════════════════════════════════════
   keys = {
     -- ─────────────────────────────────────────────────────────────
-    -- ПОИСК ФАЙЛОВ (Picker)
+    -- DASHBOARD / HOME (AstroNvim: <leader>h)
     -- ─────────────────────────────────────────────────────────────
-    { "<leader>ff", function() Snacks.picker.files() end, desc = "Найти файлы" },
-    { "<leader>fg", function() Snacks.picker.grep() end, desc = "Поиск текста (grep)" },
-    { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Буферы" },
-    { "<leader>fh", function() Snacks.picker.help() end, desc = "Справка" },
-    { "<leader>fr", function() Snacks.picker.recent() end, desc = "Недавние файлы" },
+    { "<leader>h", function()
+      if vim.bo.filetype == "snacks_dashboard" then
+        Snacks.bufdelete()
+      else
+        Snacks.dashboard()
+      end
+    end, desc = "Домашний экран" },
+
+    -- ─────────────────────────────────────────────────────────────
+    -- ПОИСК ФАЙЛОВ / PICKER (AstroNvim style <leader>f)
+    -- ─────────────────────────────────────────────────────────────
+    -- Возобновить предыдущий поиск
+    { "<leader>f<CR>", function() Snacks.picker.resume() end, desc = "Продолжить предыдущий поиск" },
+
+    -- Файлы
+    { "<leader>ff", function()
+      Snacks.picker.files({
+        hidden = vim.tbl_get((vim.uv or vim.loop).fs_stat(".git") or {}, "type") == "directory"
+      })
+    end, desc = "Найти файлы" },
+    { "<leader>fF", function()
+      Snacks.picker.files({ hidden = true, ignored = true })
+    end, desc = "Найти все файлы" },
+    { "<leader>fg", function() Snacks.picker.git_files() end, desc = "Найти git-файлы" },
+
+    -- Grep / слова
+    { "<leader>fw", function() Snacks.picker.grep() end, desc = "Найти слова" },
+    { "<leader>fW", function()
+      Snacks.picker.grep({ hidden = true, ignored = true })
+    end, desc = "Найти слова во всех файлах" },
     { "<leader>fc", function() Snacks.picker.grep_word() end, desc = "Найти слово под курсором", mode = { "n", "x" } },
-    { "<leader>fp", function() Snacks.picker.projects() end, desc = "Проекты" },
+
+    -- Буферы
+    { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Найти буферы" },
+    { "<leader>bb", function() Snacks.picker.buffers() end, desc = "Найти буферы" },
+
+    -- Недавние файлы
+    { "<leader>fo", function() Snacks.picker.recent() end, desc = "Найти недавние файлы" },
+    { "<leader>fO", function()
+      Snacks.picker.recent({ filter = { cwd = true } })
+    end, desc = "Найти недавние файлы (cwd)" },
+
+    -- Справка / документация
+    { "<leader>fh", function() Snacks.picker.help() end, desc = "Найти справку" },
+    { "<leader>fm", function() Snacks.picker.man() end, desc = "Найти man-страницы" },
+
+    -- Прочий поиск
+    { "<leader>fk", function() Snacks.picker.keymaps() end, desc = "Найти хоткеи" },
+    { "<leader>fC", function() Snacks.picker.commands() end, desc = "Найти команды" },
+    { "<leader>f'", function() Snacks.picker.marks() end, desc = "Найти метки" },
+    { "<leader>fr", function() Snacks.picker.registers() end, desc = "Найти регистры" },
+    { "<leader>fn", function() Snacks.picker.notifications() end, desc = "Найти уведомления" },
+    { "<leader>ft", function() Snacks.picker.colorschemes() end, desc = "Найти темы" },
+    { "<leader>fu", function() Snacks.picker.undo() end, desc = "Найти историю undo" },
+    { "<leader>fl", function() Snacks.picker.lines() end, desc = "Найти строки" },
+    { "<leader>fs", function() Snacks.picker.smart() end, desc = "Умный поиск (буферы/недавние/файлы)" },
+    { "<leader>fp", function() Snacks.picker.projects() end, desc = "Найти проекты" },
+
+    -- Файлы конфига (AstroNvim: <leader>fa)
+    { "<leader>fa", function()
+      Snacks.picker.files({ cwd = vim.fn.stdpath("config") })
+    end, desc = "Найти файлы конфига" },
+
+    -- Строки / поиск по буферу
     { "<leader>/", function() Snacks.picker.lines() end, desc = "Поиск в буфере" },
     { "<leader>:", function() Snacks.picker.command_history() end, desc = "История команд" },
-    
+
     -- ─────────────────────────────────────────────────────────────
-    -- GIT
+    -- GIT (AstroNvim style <leader>g)
     -- ─────────────────────────────────────────────────────────────
     { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
-    { "<leader>gf", function() Snacks.picker.git_files() end, desc = "Git файлы" },
-    { "<leader>gc", function() Snacks.picker.git_log() end, desc = "Git коммиты" },
-    { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git статус" },
-    { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git ветки" },
-    { "<leader>gB", function() Snacks.git_blame_line() end, desc = "Git blame строки" },
-    
+    { "<leader>tl", function() Snacks.lazygit() end, desc = "Lazygit" },
+    { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git-ветки" },
+    { "<leader>gc", function() Snacks.picker.git_log() end, desc = "Git-коммиты (репозиторий)" },
+    { "<leader>gC", function()
+      Snacks.picker.git_log({ current_file = true, follow = true })
+    end, desc = "Git-коммиты (текущий файл)" },
+    { "<leader>gt", function() Snacks.picker.git_status() end, desc = "Git-статус" },
+    { "<leader>gT", function() Snacks.picker.git_stash() end, desc = "Git-stash" },
+    { "<leader>go", function() Snacks.gitbrowse() end, desc = "Git-browse (открыть)", mode = { "n", "x" } },
+    { "<leader>gB", function() Snacks.git_blame_line() end, desc = "Git-blame для строки" },
+
     -- ─────────────────────────────────────────────────────────────
-    -- LSP
+    -- LSP (AstroNvim style)
     -- ─────────────────────────────────────────────────────────────
-    { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Определение" },
-    { "gr", function() Snacks.picker.lsp_references() end, desc = "Ссылки" },
-    { "gI", function() Snacks.picker.lsp_implementations() end, desc = "Реализации" },
-    { "gy", function() Snacks.picker.lsp_type_definitions() end, desc = "Тип определения" },
-    { "<leader>ss", function() Snacks.picker.lsp_symbols() end, desc = "Символы документа" },
-    { "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "Символы проекта" },
-    
+    { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Перейти к определению" },
+    { "gr", function() Snacks.picker.lsp_references() end, desc = "Перейти к использованиям" },
+    { "gI", function() Snacks.picker.lsp_implementations() end, desc = "Перейти к реализациям" },
+    { "gy", function() Snacks.picker.lsp_type_definitions() end, desc = "Перейти к определению типа" },
+    { "gO", function() Snacks.picker.lsp_symbols() end, desc = "Символы документа" },
+
+    { "<leader>ls", function()
+      local aerial_avail, aerial = pcall(require, "aerial")
+      if aerial_avail and aerial.snacks_picker then
+        aerial.snacks_picker()
+      else
+        Snacks.picker.lsp_symbols()
+      end
+    end, desc = "Символы документа" },
+    { "<leader>lG", function() Snacks.picker.lsp_workspace_symbols() end, desc = "Символы рабочей области" },
+    { "<leader>lD", function() Snacks.picker.diagnostics() end, desc = "Все диагностики" },
+
     -- ─────────────────────────────────────────────────────────────
-    -- УВЕДОМЛЕНИЯ
+    -- UI TOGGLES (AstroNvim style <leader>u)
     -- ─────────────────────────────────────────────────────────────
-    { "<leader>un", function() Snacks.notifier.hide() end, desc = "Скрыть уведомления" },
-    { "<leader>uN", function() Snacks.picker.notifications() end, desc = "История уведомлений" },
-    
+    { "<leader>uD", function() Snacks.notifier.hide() end, desc = "Скрыть уведомления" },
+    { "<leader>u|", function() Snacks.toggle.indent():toggle() end, desc = "Переключить направляющие отступов" },
+    { "<leader>uZ", function() Snacks.toggle.zen():toggle() end, desc = "Переключить режим zen" },
+
     -- ─────────────────────────────────────────────────────────────
-    -- ТЕРМИНАЛ
+    -- ТЕРМИНАЛ (AstroNvim style <leader>t)
     -- ─────────────────────────────────────────────────────────────
-    { "<leader>tt", function() Snacks.terminal() end, desc = "Открыть терминал" },
-    { "<c-/>", function() Snacks.terminal() end, desc = "Открыть терминал", mode = { "n", "t" } },
-    
+    { "<leader>tf", function() Snacks.terminal(nil, { win = { position = "float" } }) end, desc = "Плавающий терминал" },
+    { "<leader>th", function() Snacks.terminal(nil, { win = { position = "bottom", height = 0.3 } }) end, desc = "Горизонтальный терминал" },
+    { "<leader>tv", function() Snacks.terminal(nil, { win = { position = "right", width = 0.4 } }) end, desc = "Вертикальный терминал" },
+    { "<F7>", function() Snacks.terminal() end, desc = "Переключить терминал", mode = { "n", "t" } },
+    { "<C-/>", function() Snacks.terminal() end, desc = "Переключить терминал", mode = { "n", "t" } },
+    { "<C-'>", function() Snacks.terminal() end, desc = "Переключить терминал", mode = { "n", "t" } },
+
+    -- ─────────────────────────────────────────────────────────────
+    -- БУФЕРЫ (AstroNvim style <leader>b)
+    -- ─────────────────────────────────────────────────────────────
+    { "<leader>bd", function() Snacks.bufdelete() end, desc = "Закрыть буфер" },
+    { "<leader>bD", function() Snacks.bufdelete.all() end, desc = "Закрыть все буферы" },
+    { "<leader>bo", function() Snacks.bufdelete.other() end, desc = "Закрыть остальные буферы" },
+
     -- ─────────────────────────────────────────────────────────────
     -- РАЗНОЕ
     -- ─────────────────────────────────────────────────────────────
-    { "<leader>.", function() Snacks.scratch() end, desc = "Scratch буфер" },
-    { "<leader>S", function() Snacks.scratch.select() end, desc = "Выбрать scratch" },
-    { "<leader>bd", function() Snacks.bufdelete() end, desc = "Удалить буфер" },
-    { "<leader>bD", function() Snacks.bufdelete.all() end, desc = "Удалить все буферы" },
-    { "]]", function() Snacks.words.jump(vim.v.count1) end, desc = "Следующее слово", mode = { "n", "t" } },
-    { "[[", function() Snacks.words.jump(-vim.v.count1) end, desc = "Предыдущее слово", mode = { "n", "t" } },
+    { "<leader>.", function() Snacks.scratch() end, desc = "Scratch-буфер" },
+    { "<leader>S", function() Snacks.scratch.select() end, desc = "Выбрать scratch-буфер" },
+    { "]]", function() Snacks.words.jump(vim.v.count1) end, desc = "Следующее вхождение", mode = { "n", "t" } },
+    { "[[", function() Snacks.words.jump(-vim.v.count1) end, desc = "Предыдущее вхождение", mode = { "n", "t" } },
   },
-  
+
   init = function()
-    -- Настройка vim.notify для использования Snacks notifier
     vim.api.nvim_create_autocmd("User", {
       pattern = "VeryLazy",
       callback = function()
         -- Глобальный доступ к Snacks
         _G.Snacks = require("snacks")
-        
+
         -- Используем Snacks для vim.notify
         vim.notify = Snacks.notifier.notify
-        
-        -- Включаем отладочную функцию
-        _G.dd = function(...)
-          Snacks.debug.inspect(...)
-        end
-        _G.bt = function()
-          Snacks.debug.backtrace()
-        end
+
+        -- Debug functions
+        _G.dd = function(...) Snacks.debug.inspect(...) end
+        _G.bt = function() Snacks.debug.backtrace() end
         vim.print = _G.dd
-        
-        -- Переключение различных опций
+
+        -- UI Toggles (AstroNvim style)
         Snacks.toggle.option("spell", { name = "Проверка орфографии" }):map("<leader>us")
         Snacks.toggle.option("wrap", { name = "Перенос строк" }):map("<leader>uw")
-        Snacks.toggle.option("relativenumber", { name = "Относительные номера" }):map("<leader>uL")
+        Snacks.toggle.option("relativenumber", { name = "Относительная нумерация" }):map("<leader>uL")
         Snacks.toggle.diagnostics():map("<leader>ud")
-        Snacks.toggle.line_number():map("<leader>ul")
+        Snacks.toggle.line_number():map("<leader>un")
         Snacks.toggle.treesitter():map("<leader>uT")
         Snacks.toggle.inlay_hints():map("<leader>uh")
         Snacks.toggle.dim():map("<leader>uD")
+
+        -- Additional toggles
+        Snacks.toggle.option("background", { off = "light", on = "dark", name = "Тёмный фон" }):map("<leader>ub")
       end,
     })
   end,

@@ -88,7 +88,7 @@ return {
   end,
   
   keys = {
-    { "<leader>tc", "<cmd>TailwindConcealToggle<cr>", desc = "Toggle Tailwind скрытие" },
+    { "<leader>tc", "<cmd>TailwindConcealToggle<cr>", desc = "Переключить скрытие Tailwind" },
     { "<leader>ts", "<cmd>TailwindSort<cr>", desc = "Сортировать Tailwind классы" },
     { "<leader>ts", "<cmd>TailwindSortSelection<cr>", mode = "v", desc = "Сортировать выделенные классы" },
   },

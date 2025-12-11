@@ -133,4 +133,30 @@ require("lazy").setup(all_plugins, {
   },
 })
 
-print("✓ Конфигурация standalone Neovim загружена!")
+-- =====================================================================
+-- СОЧЕТАНИЯ КЛАВИШ ДЛЯ УПРАВЛЕНИЯ ПАКЕТАМИ (стиль AstroNvim, <leader>p)
+-- =====================================================================
+
+local keymap = vim.keymap.set
+
+-- Lazy
+keymap("n", "<leader>pi", function() require("lazy").install() end, { desc = "Установить плагины" })
+keymap("n", "<leader>ps", function() require("lazy").home() end, { desc = "Статус плагинов" })
+keymap("n", "<leader>pS", function() require("lazy").sync() end, { desc = "Синхронизировать плагины" })
+keymap("n", "<leader>pu", function() require("lazy").check() end, { desc = "Проверить обновления плагинов" })
+keymap("n", "<leader>pU", function() require("lazy").update() end, { desc = "Обновить плагины" })
+
+-- Mason
+keymap("n", "<leader>pm", "<cmd>Mason<CR>", { desc = "Открыть Mason" })
+keymap("n", "<leader>pM", "<cmd>MasonUpdate<CR>", { desc = "Обновить Mason" })
+
+-- Обновить всё (Lazy + Mason)
+keymap("n", "<leader>pa", function()
+  require("lazy").sync()
+  vim.cmd("MasonUpdate")
+end, { desc = "Обновить всё (Lazy + Mason)" })
+
+-- Информация о LSP
+keymap("n", "<leader>li", "<cmd>LspInfo<CR>", { desc = "Информация LSP" })
+
+print("✓ Конфигурация standalone Neovim загружена (AstroNvim style)!")

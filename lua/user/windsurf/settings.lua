@@ -38,6 +38,23 @@ _G.VSCodeAction = function(cmd, opts)
 end
 
 -- =====================================================================
+-- ОТКЛЮЧЕНИЕ OVERRIDE КЛАВИШ Z
+-- =====================================================================
+
+-- Попытка отключить override прокрутки vscode-neovim
+-- Это выполнится при загрузке settings.lua
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    vim.defer_fn(function()
+      -- Отключаем все z-команды, которые переопределяет расширение
+      for _, key in ipairs({"zz", "zb", "zt", "z-", "z.", "z<CR>", "z=", "zo", "zc", "za", "zr", "zm", "zR", "zM", "zn", "zN", "zh", "zl", "zk", "zj"}) do
+        vim.keymap.set("n", key, "<Nop>", { noremap = true, silent = true })
+      end
+    end, 150)
+  end,
+})
+
+-- =====================================================================
 -- ТЕСТОВЫЕ КОМАНДЫ
 -- =====================================================================
 function TestConfig()

@@ -4,7 +4,7 @@ local opts = {
     silent = true
 }
 
--- remap leader key
+-- Переназначение leader-клавиши
 keymap("n", "<leader>", " ", opts)
 
 local vscode = require('vscode')
@@ -235,23 +235,24 @@ keymap('n', '<leader>fp', '<Cmd>call VSCodeNotify("workbench.action.quickOpenRec
 })
 
 -- Сортировка выделения
-vim.keymap.set('v', 'gs', ':sort<CR>', { desc = 'Sort' })
+vim.keymap.set('v', 'gs', ':sort<CR>', { desc = 'Сортировать' })
 
 -- Переход к ошибкам (VSCode markers)
 keymap('n', 'ge', function()
     vim.fn.VSCodeNotify("editor.action.marker.next")
 end, {
-    desc = 'next error'
+    desc = 'следующая ошибка'
 })
 
 keymap('n', 'gE', function()
     vim.fn.VSCodeNotify("editor.action.marker.prev")
 end, {
-    desc = 'prev error'
+    desc = 'предыдущая ошибка'
 })
 
 -- ========================================================================= --
 -- ======================= НИЖЕ НЕ РЕДАКТИРОВАТЬ ======================= --
 -- ========================================================================= --
+
 
 print("Конфигурация клавиш загружена!")

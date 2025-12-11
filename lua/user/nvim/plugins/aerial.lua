@@ -49,6 +49,6 @@ return {
   },
   
   keys = {
-    { "<leader>a", "<cmd>AerialToggle!<cr>", desc = "Outline" },
+    { "<leader>a", "<cmd>AerialToggle!<cr>", desc = "Структура файла" },
   },
 }

@@ -122,21 +122,21 @@ return {
       end, { desc = "Предыдущий hunk" })
       
       -- Действия с hunk'ами
-      map("n", "<leader>hs", gs.stage_hunk, { desc = "Stage hunk" })
-      map("n", "<leader>hr", gs.reset_hunk, { desc = "Reset hunk" })
+      map("n", "<leader>hs", gs.stage_hunk, { desc = "Добавить hunk в индекс" })
+      map("n", "<leader>hr", gs.reset_hunk, { desc = "Сбросить hunk" })
       
       map("v", "<leader>hs", function()
         gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-      end, { desc = "Stage hunk" })
+      end, { desc = "Добавить выделенный hunk в индекс" })
       
       map("v", "<leader>hr", function()
         gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-      end, { desc = "Reset hunk" })
+      end, { desc = "Сбросить выделенный hunk" })
       
-      map("n", "<leader>hS", gs.stage_buffer, { desc = "Stage буфер" })
-      map("n", "<leader>hR", gs.reset_buffer, { desc = "Reset буфер" })
-      map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "Undo stage hunk" })
-      map("n", "<leader>hp", gs.preview_hunk, { desc = "Preview hunk" })
+      map("n", "<leader>hS", gs.stage_buffer, { desc = "Добавить буфер в индекс" })
+      map("n", "<leader>hR", gs.reset_buffer, { desc = "Сбросить буфер" })
+      map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "Отменить добавление hunk" })
+      map("n", "<leader>hp", gs.preview_hunk, { desc = "Предпросмотр hunk" })
       
       -- Blame
       map("n", "<leader>hb", function()
@@ -148,17 +148,17 @@ return {
       end, { desc = "Blame буфера" })
       
       -- Diff
-      map("n", "<leader>hd", gs.diffthis, { desc = "Diff" })
+      map("n", "<leader>hd", gs.diffthis, { desc = "Сравнить изменения (diff)" })
       map("n", "<leader>hD", function()
         gs.diffthis("~")
       end, { desc = "Diff против HEAD" })
       
-      -- Toggles
-      map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "Toggle blame строки" })
-      map("n", "<leader>td", gs.toggle_deleted, { desc = "Toggle удалённые строки" })
+      -- Переключатели
+      map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "Переключить blame строки" })
+      map("n", "<leader>td", gs.toggle_deleted, { desc = "Переключить показ удалённых строк" })
       
       -- Текстовый объект для hunk
-      map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Hunk (inner)" })
+      map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Внутри hunk" })
     end,
   },
 }

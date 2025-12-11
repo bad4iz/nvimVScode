@@ -225,10 +225,10 @@ return {
           local current = vim.diagnostic.config().virtual_text
           vim.diagnostic.config({ virtual_text = not current })
           vim.notify(
-            "Virtual text: " .. (current and "OFF" or "ON"),
+            "Виртуальный текст диагностики: " .. (current and "OFF" or "ON"),
             vim.log.levels.INFO
           )
-        end, "Toggle virtual text")
+        end, "Переключить виртуальный текст диагностики")
         
         -- Форматирование
         map("<leader>lf", function()

@@ -22,6 +22,7 @@
 -- Загружаем дополнительные настройки для nvim
 require("user.nvim.options")
 require("user.nvim.autocmds")
+require("user.nvim.keymaps")
 
 -- Собираем все плагины из common и nvim
 local common_plugins = {}

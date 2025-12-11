@@ -22,7 +22,8 @@ lua/user/
 └── nvim/            # Полная конфигурация для standalone
     ├── options.lua  # Дополнительные опции
     ├── autocmds.lua # Автокоманды
-    └── plugins/     # 27+ плагинов (LSP, treesitter, UI и т.д.)
+    ├── keymaps.lua  # Горячие клавиши для standalone
+    └── plugins/     # 25 плагинов (LSP, treesitter, UI и т.д.)
 ```
 
 **Определение режима** происходит в `init.lua` через проверку `vim.g.vscode`.
@@ -43,17 +44,32 @@ Lock-файл: `lazy-lock.json`
 
 ### LSP (lua/user/nvim/plugins/lsp.lua + mason.lua)
 - **Mason** автоматически устанавливает LSP серверы
-- Серверы: `vtsls` (TypeScript), `html`, `css`, `tailwindcss`, `lua_ls`, `eslint`, `emmet`
+- Серверы: `vtsls` (TypeScript), `html`, `css`, `tailwindcss`, `jsonls`, `yamlls`, `lua_ls`, `eslint`, `emmet`, `marksman` (Markdown)
 - Команды: `:Mason`, `:LspInfo`
 
 ### Автодополнение (blink-cmp.lua)
-- **blink.cmp** — Rust-based автодополнение
+- **blink.cmp** — Rust-based авто дополнение 
 - Интеграция с LuaSnip и friendly-snippets
 
-### Форматирование и линтинг
+### Форматирование и линтинг (conform.lua + nvim-lint.lua)
 - **conform.nvim** — форматирование (`prettierd`, `stylua`)
 - **nvim-lint** — линтинг (`eslint_d`)
 - Автоформатирование при сохранении включено
+
+### Markdown (markdown.lua)
+- **render-markdown.nvim** — рендеринг в Neovim (заголовки, списки, таблицы, код)
+- **markdown-preview.nvim** — предварительный просмотр в браузере
+- **marksman LSP** — автодополнение и навигация
+- Диагностика и spell checking отключены по умолчанию
+- Горячие клавиши: `<leader>mr` (toggle рендеринг), `<leader>mp` (preview), `<leader>md` (toggle диагностику)
+
+### Spell Checking (spell.lua)
+- Проверка орфографии для **русского** и **английского** языков
+- **Включена по умолчанию** для всех файлов (оба языка одновременно)
+- Словари загружаются через команду `:SpellInstall`
+- Пользовательские слова сохраняются в `~/.config/nvim/spell/`
+- Горячие клавиши: `<leader>us` (toggle), `<leader>ul` (переключить язык), `zg` (добавить слово), `z=` (исправить)
+- Команды: `:SpellInfo`, `:SpellInstall`, `:SpellAdd`
 
 ### UI и навигация
 - **snacks.nvim** — dashboard, picker, notifier, terminal
@@ -94,8 +110,8 @@ Lock-файл: `lazy-lock.json`
 
 ## Особенности
 
-- **Better Escape** — `jj`/`jk` для выхода из insert режима
-- **Lazy loading** — все плагины загружаются лениво
+- **Lazy loading** — все плагины загружаются лениво через `cmd`, `event`, `ft`, `keys`
 - **Persistent undo** — история отмены в `~/.local/share/nvim/undo_history`
-- Treesitter отключается для файлов > 100KB
-- Используются демоны (`prettierd`, `eslint_d`) для быстрой работы
+- **Treesitter** — отключается автоматически для файлов > 100KB
+- **Демоны** — используются `prettierd` и `eslint_d` для быстрой работы
+- **Модульная архитектура** — все настройки плагина в одном файле

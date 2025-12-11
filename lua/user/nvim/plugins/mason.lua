@@ -41,7 +41,8 @@ return {
       "eslint-lsp",
       "emmet-ls",
       "sonarlint-language-server",
-      
+      "marksman", -- Markdown LSP
+
       -- Форматтеры (претиерд быстрее)
       "prettierd",
       "stylua",

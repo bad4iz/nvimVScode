@@ -116,7 +116,8 @@ autocmd("FileType", {
   pattern = { "markdown" },
   callback = function()
     vim.opt_local.wrap = true
-    vim.opt_local.spell = true
+    -- Spell checking отключен - настраивается в lua/user/nvim/plugins/markdown.lua
+    -- vim.opt_local.spell = true
   end,
   desc = "Настройки для Markdown",
 })

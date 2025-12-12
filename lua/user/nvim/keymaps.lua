@@ -9,153 +9,204 @@
 =====================================================================
 --]]
 
-local keymap = vim.keymap.set
+local function term_nav(dir)
+  return function()
+    if vim.api.nvim_win_get_config(0).zindex then
+      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-" .. dir .. ">", true, false, true), "n", false)
+    else
+      vim.cmd.wincmd(dir)
+    end
+  end
+end
+
+local M = {}
 
 -- =====================================================================
--- ВЫХОД (Neovim only)
+-- NORMAL MODE
 -- =====================================================================
+M.n = {
+  -- Простые клавиши
+  ["<Esc>"] = { "<cmd>nohlsearch<CR>", desc = "Убрать подсветку поиска" },
+  ["|"] = { "<cmd>vsplit<CR>", desc = "Вертикальный сплит" },
+  ["\\"] = { "<cmd>split<CR>", desc = "Горизонтальный сплит" },
+  ["J"] = { "mzJ`z", desc = "Объединить строки (сохранить курсор)" },
 
-keymap("n", "<leader>q", "<cmd>confirm q<CR>", { desc = "Закрыть окно" })
-keymap("n", "<leader>Q", "<cmd>confirm qall<CR>", { desc = "Выйти из Neovim" })
-keymap("n", "<C-q>", "<cmd>q!<CR>", { desc = "Принудительный выход" })
+  -- ═══════════════════════════════════════════════════════════════
+  -- <leader> группа
+  -- ═══════════════════════════════════════════════════════════════
+  ["<leader>"] = {
+    ["/"] = { "gcc", remap = true, desc = "Toggle comment line" },
+    ["n"] = { "<cmd>enew<CR>", desc = "Новый файл" },
+    ["q"] = { "<cmd>confirm q<CR>", desc = "Закрыть окно" },
+    ["Q"] = { "<cmd>confirm qall<CR>", desc = "Выйти из Neovim" },
+    ["d"] = { [["_d]], desc = "Удалить в черную дыру" },
+    ["y"] = { [["+y]], desc = "Копировать в буфер обмена" },
+    ["Y"] = { [["+Y]], desc = "Копировать строку в буфер обмена" },
+    ["c"] = { function() require("snacks").bufdelete() end, desc = "Закрыть буфер" },
+    ["C"] = { function() require("snacks").bufdelete({ force = true }) end, desc = "Принудительно закрыть буфер" },
 
--- =====================================================================
--- НОВЫЙ ФАЙЛ И СПЛИТЫ (Neovim only)
--- =====================================================================
+    -- <leader>b - буферы
+    b = {
+      p = { "<cmd>bprevious<CR>", desc = "Предыдущий буфер" },
+    },
 
-keymap("n", "<leader>n", "<cmd>enew<CR>", { desc = "Новый файл" })
-keymap("n", "|", "<cmd>vsplit<CR>", { desc = "Вертикальный сплит" })
-keymap("n", "\\", "<cmd>split<CR>", { desc = "Горизонтальный сплит" })
+    -- <leader>l - LSP
+    l = {
+      d = { function() vim.diagnostic.open_float() end, desc = "Диагностика строки" },
+    },
 
--- =====================================================================
--- ОТМЕНА ПОДСВЕТКИ ПОИСКА (Neovim only)
--- =====================================================================
+    -- <leader>x - списки
+    x = {
+      q = { "<cmd>copen<CR>", desc = "Список quickfix" },
+      l = { "<cmd>lopen<CR>", desc = "Список расположения" },
+    },
 
-keymap("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Убрать подсветку поиска" })
+    -- <leader>u - UI/Toggle
+    u = {
+      Y = {
+        function() require("astrolsp.toggles").buffer_semantic_tokens() end,
+        desc = "Toggle LSP semantic highlight (buffer)",
+        cond = function(client)
+          return client.supports_method "textDocument/semanticTokens/full" and vim.lsp.semantic_tokens
+        end,
+      },
+    },
+  },
 
--- =====================================================================
--- КОММЕНТИРОВАНИЕ (Neovim only - зависит от comment.nvim)
--- =====================================================================
 
-keymap("n", "<leader>/", "gcc", { remap = true, desc = "Toggle comment line" })
-keymap("x", "<leader>/", "gc", { remap = true, desc = "Toggle comment" })
-keymap("n", "gco", "o<Esc>Vcx<Esc><cmd>normal gcc<CR>fxa<BS>", { desc = "Добавить комментарий ниже" })
-keymap("n", "gcO", "O<Esc>Vcx<Esc><cmd>normal gcc<CR>fxa<BS>", { desc = "Добавить комментарий выше" })
+  -- ═══════════════════════════════════════════════════════════════
+  -- [ группа (предыдущий)
+  -- ═══════════════════════════════════════════════════════════════
+  ["["] = {
+    b = { "<cmd>bprevious<CR>", desc = "Предыдущий буфер" },
+    t = { "<cmd>tabprevious<CR>", desc = "Предыдущая вкладка" },
+    q = { "<cmd>cprev<CR>", desc = "Предыдущий quickfix" },
+    Q = { "<cmd>cfirst<CR>", desc = "Первый quickfix" },
+    l = { "<cmd>lprev<CR>", desc = "Предыдущий loclist" },
+    L = { "<cmd>lfirst<CR>", desc = "Первый loclist" },
+    d = { function() vim.diagnostic.goto_prev() end, desc = "Предыдущая диагностика" },
+    e = { function() vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR }) end, desc = "Предыдущая ошибка" },
+    w = { function() vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.WARN }) end, desc = "Предыдущее предупреждение" },
+  },
 
--- =====================================================================
--- РЕДАКТИРОВАНИЕ (Neovim only)
--- =====================================================================
+  -- ═══════════════════════════════════════════════════════════════
+  -- ] группа (следующий)
+  -- ═══════════════════════════════════════════════════════════════
+  ["]"] = {
+    b = { "<cmd>bnext<CR>", desc = "Следующий буфер" },
+    t = { "<cmd>tabnext<CR>", desc = "Следующая вкладка" },
+    q = { "<cmd>cnext<CR>", desc = "Следующий quickfix" },
+    Q = { "<cmd>clast<CR>", desc = "Последний quickfix" },
+    l = { "<cmd>lnext<CR>", desc = "Следующий loclist" },
+    L = { "<cmd>llast<CR>", desc = "Последний loclist" },
+    d = { function() vim.diagnostic.goto_next() end, desc = "Следующая диагностика" },
+    e = { function() vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR }) end, desc = "Следующая ошибка" },
+    w = { function() vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.WARN }) end, desc = "Следующее предупреждение" },
+  },
 
--- Перемещение строк в визуальном режиме
-keymap("v", "J", ":m '>+1<CR>gv=gv", { desc = "Переместить строку вниз" })
-keymap("v", "K", ":m '<-2<CR>gv=gv", { desc = "Переместить строку вверх" })
+  -- ═══════════════════════════════════════════════════════════════
+  -- <C-> группа (Ctrl+)
+  -- ═══════════════════════════════════════════════════════════════
+  ["<C-"] = {
+    ["q>"] = { "<cmd>q!<CR>", desc = "Принудительный выход" },
+    ["h>"] = { "<C-w>h", desc = "Влево в окно" },
+    ["j>"] = { "<C-w>j", desc = "Вниз в окно" },
+    ["k>"] = { "<C-w>k", desc = "Вверх в окно" },
+    ["l>"] = { "<C-w>l", desc = "Вправо в окно" },
+    ["Up>"] = { "<cmd>resize -2<CR>", desc = "Уменьшить высоту окна" },
+    ["Down>"] = { "<cmd>resize +2<CR>", desc = "Увеличить высоту окна" },
+    ["Left>"] = { "<cmd>vertical resize -2<CR>", desc = "Уменьшить ширину окна" },
+    ["Right>"] = { "<cmd>vertical resize +2<CR>", desc = "Увеличить ширину окна" },
+  },
 
--- Сохранение позиции курсора при J (объединение строк)
-keymap("n", "J", "mzJ`z", { desc = "Объединить строки (сохранить курсор)" })
-
--- Вставка без потери буфера
-keymap("x", "<leader>p", [["_dP]], { desc = "Вставить без замены буфера" })
-
--- Удаление в черную дыру (не в буфер)
-keymap({ "n", "v" }, "<leader>d", [["_d]], { desc = "Удалить в черную дыру" })
-
--- Копирование в системный буфер
-keymap({ "n", "v" }, "<leader>y", [["+y]], { desc = "Копировать в буфер обмена" })
-keymap("n", "<leader>Y", [["+Y]], { desc = "Копировать строку в буфер обмена" })
-
--- =====================================================================
--- ОТСТУПЫ В ВИЗУАЛЬНОМ РЕЖИМЕ (Neovim only)
--- =====================================================================
-
-keymap("v", "<", "<gv", { desc = "Indent left" })
-keymap("v", ">", ">gv", { desc = "Сдвиг вправо" })
-
--- =====================================================================
--- РАБОТА С ОКНАМИ (Neovim only)
--- =====================================================================
-
--- Навигация между окнами
-keymap("n", "<C-h>", "<C-w>h", { desc = "Влево в окно" })
-keymap("n", "<C-j>", "<C-w>j", { desc = "Вниз в окно" })
-keymap("n", "<C-k>", "<C-w>k", { desc = "Вверх в окно" })
-keymap("n", "<C-l>", "<C-w>l", { desc = "Вправо в окно" })
-
--- Изменение размера окон
-keymap("n", "<C-Up>", "<cmd>resize -2<CR>", { desc = "Уменьшить высоту окна" })
-keymap("n", "<C-Down>", "<cmd>resize +2<CR>", { desc = "Увеличить высоту окна" })
-keymap("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Уменьшить ширину окна" })
-keymap("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Увеличить ширину окна" })
-
--- =====================================================================
--- БУФЕРЫ (Neovim only)
--- =====================================================================
-
--- Навигация по буферам
-keymap("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Предыдущий буфер" })
-keymap("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Следующий буфер" })
-keymap("n", "[b", "<cmd>bprevious<CR>", { desc = "Предыдущий буфер" })
-keymap("n", "]b", "<cmd>bnext<CR>", { desc = "Следующий буфер" })
-keymap("n", "<leader>bp", "<cmd>bprevious<CR>", { desc = "Предыдущий буфер" })
-
--- Закрытие буфера (умное удаление через Snacks)
-keymap("n", "<leader>c", function() require("snacks").bufdelete() end, { desc = "Закрыть буфер" })
-keymap("n", "<leader>C", function() require("snacks").bufdelete({ force = true }) end, { desc = "Принудительно закрыть буфер" })
-
--- =====================================================================
--- ТАБЫ (Neovim only)
--- =====================================================================
-
-keymap("n", "]t", "<cmd>tabnext<CR>", { desc = "Следующая вкладка" })
-keymap("n", "[t", "<cmd>tabprevious<CR>", { desc = "Предыдущая вкладка" })
-
--- =====================================================================
--- QUICKFIX/LOCLIST (Neovim only)
--- =====================================================================
-
-keymap("n", "<leader>xq", "<cmd>copen<CR>", { desc = "Список quickfix" })
-keymap("n", "<leader>xl", "<cmd>lopen<CR>", { desc = "Список расположения" })
-keymap("n", "]q", "<cmd>cnext<CR>", { desc = "Следующий quickfix" })
-keymap("n", "[q", "<cmd>cprev<CR>", { desc = "Предыдущий quickfix" })
-keymap("n", "]Q", "<cmd>clast<CR>", { desc = "Последний quickfix" })
-keymap("n", "[Q", "<cmd>cfirst<CR>", { desc = "Первый quickfix" })
-keymap("n", "]l", "<cmd>lnext<CR>", { desc = "Следующий loclist" })
-keymap("n", "[l", "<cmd>lprev<CR>", { desc = "Предыдущий loclist" })
-keymap("n", "]L", "<cmd>llast<CR>", { desc = "Последний loclist" })
-keymap("n", "[L", "<cmd>lfirst<CR>", { desc = "Первый loclist" })
+  -- ═══════════════════════════════════════════════════════════════
+  -- <S-> группа (Shift+)
+  -- ═══════════════════════════════════════════════════════════════
+  ["<S-"] = {
+    ["h>"] = { "<cmd>bprevious<CR>", desc = "Предыдущий буфер" },
+    ["l>"] = { "<cmd>bnext<CR>", desc = "Следующий буфер" },
+  },
+}
 
 -- =====================================================================
--- ДИАГНОСТИКА (Neovim only - использует vim.diagnostic API)
+-- VISUAL MODE
 -- =====================================================================
+M.v = {
+  ["J"] = { ":m '>+1<CR>gv=gv", desc = "Переместить строку вниз" },
+  ["K"] = { ":m '<-2<CR>gv=gv", desc = "Переместить строку вверх" },
+  ["<"] = { "<gv", desc = "Сдвиг влево" },
+  [">"] = { ">gv", desc = "Сдвиг вправо" },
 
-keymap("n", "gl", vim.diagnostic.open_float, { desc = "Диагностика под курсором" })
-keymap("n", "<leader>ld", vim.diagnostic.open_float, { desc = "Диагностика строки" })
-keymap("n", "[d", vim.diagnostic.goto_prev, { desc = "Предыдущая диагностика" })
-keymap("n", "]d", vim.diagnostic.goto_next, { desc = "Следующая диагностика" })
+  g = {
+    s = { ":sort<CR>", desc = "Сортировать выделение" },
+  },
 
--- Ошибки и предупреждения
-keymap("n", "[e", function()
-  vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
-end, { desc = "Предыдущая ошибка" })
-keymap("n", "]e", function()
-  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
-end, { desc = "Следующая ошибка" })
-keymap("n", "[w", function()
-  vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.WARN })
-end, { desc = "Предыдущее предупреждение" })
-keymap("n", "]w", function()
-  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.WARN })
-end, { desc = "Следующее предупреждение" })
+  ["<leader>"] = {
+    d = { [["_d]], desc = "Удалить в черную дыру" },
+    y = { [["+y]], desc = "Копировать в буфер обмена" },
+  },
+}
 
 -- =====================================================================
--- СОРТИРОВКА (Neovim only)
+-- VISUAL-BLOCK MODE (x)
 -- =====================================================================
-
-keymap("v", "gs", ":sort<CR>", { desc = "Сортировать выделение" })
+M.x = {
+  ["<leader>"] = {
+    ["/"] = { "gc", remap = true, desc = "Toggle comment" },
+    p = { [["_dP]], desc = "Вставить без замены буфера" },
+  },
+}
 
 -- =====================================================================
--- ПОДСВЕТКА ПРИ КОПИРОВАНИИ (Neovim only - использует autocmd)
+-- TERMINAL MODE
 -- =====================================================================
+M.t = {
+  ["<C-"] = {
+    ["h>"] = { term_nav("h"), desc = "Терминал: окно слева" },
+    ["j>"] = { term_nav("j"), desc = "Терминал: окно ниже" },
+    ["k>"] = { term_nav("k"), desc = "Терминал: окно выше" },
+    ["l>"] = { term_nav("l"), desc = "Терминал: окно справа" },
+  },
+}
 
+-- =====================================================================
+-- ПРИМЕНЕНИЕ KEYMAPS (рекурсивно для вложенной структуры)
+-- =====================================================================
+local function is_keymap_def(tbl)
+  -- Проверяем, является ли таблица определением keymap (имеет [1] как action)
+  return type(tbl) == "table" and (type(tbl[1]) == "function" or type(tbl[1]) == "string")
+end
+
+local function apply_keymaps_recursive(mode, prefix, mappings)
+  for key, value in pairs(mappings) do
+    if is_keymap_def(value) then
+      -- Это определение keymap
+      local full_key = prefix .. key
+      local action = value[1]
+      local keymap_opts = {
+        desc = value.desc,
+        remap = value.remap,
+        silent = value.silent ~= false,
+      }
+      vim.keymap.set(mode, full_key, action, keymap_opts)
+    elseif type(value) == "table" then
+      -- Это вложенная группа
+      apply_keymaps_recursive(mode, prefix .. key, value)
+    end
+  end
+end
+
+local function apply_keymaps()
+  for mode, mappings in pairs(M) do
+    apply_keymaps_recursive(mode, "", mappings)
+  end
+end
+
+apply_keymaps()
+
+-- =====================================================================
+-- ПОДСВЕТКА ПРИ КОПИРОВАНИИ
+-- =====================================================================
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
   pattern = "*",
@@ -168,23 +219,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Подсветка при копировании (yank)",
 })
 
--- =====================================================================
--- ТЕРМИНАЛ НАВИГАЦИЯ (Neovim only)
--- =====================================================================
-
-local function term_nav(dir)
-  return function()
-    if vim.api.nvim_win_get_config(0).zindex then
-      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-" .. dir .. ">", true, false, true), "n", false)
-    else
-      vim.cmd.wincmd(dir)
-    end
-  end
-end
-
-keymap("t", "<C-h>", term_nav("h"), { desc = "Terminal left window" })
-keymap("t", "<C-j>", term_nav("j"), { desc = "Терминал: окно ниже" })
-keymap("t", "<C-k>", term_nav("k"), { desc = "Терминал: окно выше" })
-keymap("t", "<C-l>", term_nav("l"), { desc = "Терминал: окно справа" })
-
 print("✓ Neovim-specific keymaps loaded")
+
+return M

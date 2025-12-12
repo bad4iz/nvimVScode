@@ -2,9 +2,26 @@
 =====================================================================
                           NVIM-CMP
 =====================================================================
-Классическая система автодополнения для Neovim.
+Классическая система автодополнения для Neovim с красивым дизайном.
 
-Источники автодополнения:
+ДИЗАЙН (стиль blink-cmp):
+  - Иконки типов слева (Kind icons)
+  - Иконки источников СПРАВА (цветные, с bold для AI)
+  - Полная цветовая палитра для всех типов
+  - Rounded borders для меню и документации
+  - Ghost text для предпросмотра
+
+ЦВЕТОВАЯ СХЕМА:
+  - Supermaven (AI)  - фиолетовый #d787ff (bold)
+  - Codeium (AI)     - бирюзовый #09b6a2 (bold)
+  - LSP              - синий #7aa2f7
+  - Сниппеты         - желтый #e0af68
+  - Путь             - желтый #e0af68
+  - Эмодзи           - розовый #f7768e
+  - Nerd Font        - фиолетовый #bb9af7
+  - Буфер            - серый #565f89
+
+Источники автодополнения (по приоритету):
   - Emoji       - эмодзи (приоритет: 15)
   - Nerd Font   - иконки Nerd Font (приоритет: 15)
   - Supermaven  - AI автодополнение (приоритет: 12)
@@ -67,7 +84,21 @@ local kind_icons = {
   TabNine = "󰏚",
 }
 
--- Иконки для источников автодополнения
+-- Иконки для источников автодополнения (показываются справа)
+local source_icons = {
+  nvim_lsp = "󰒋", -- LSP
+  luasnip = "", -- Сниппеты
+  buffer = "󰈙", -- Буфер
+  path = "󰉋", -- Путь
+  emoji = "󰞅", -- Эмодзи
+  nerdfont = "", -- Nerd Font
+  supermaven = "", -- Supermaven AI
+  codeium = "", -- Codeium AI
+  nvim_lua = "", -- Lua API
+  cmdline = "", -- Командная строка
+}
+
+-- Названия источников (для отладки)
 local source_names = {
   nvim_lsp = "LSP",
   luasnip = "Snippet",
@@ -75,7 +106,7 @@ local source_names = {
   path = "Path",
   emoji = "Emoji",
   nerdfont = "NF",
-  supermaven = "SM",
+  supermaven = "Supermaven",
   codeium = "Codeium",
   nvim_lua = "Lua",
   cmdline = "Cmd",
@@ -87,12 +118,12 @@ return {
 
   dependencies = {
     -- Источники для nvim-cmp
-    "hrsh7th/cmp-nvim-lsp",       -- LSP
-    "hrsh7th/cmp-buffer",         -- Buffer
-    "hrsh7th/cmp-path",           -- Path
-    "hrsh7th/cmp-cmdline",        -- Командная строка
-    "hrsh7th/cmp-nvim-lua",       -- Neovim Lua API
-    "saadparwaiz1/cmp_luasnip",   -- LuaSnip
+    "hrsh7th/cmp-nvim-lsp", -- LSP
+    "hrsh7th/cmp-buffer", -- Buffer
+    "hrsh7th/cmp-path", -- Path
+    "hrsh7th/cmp-cmdline", -- Командная строка
+    "hrsh7th/cmp-nvim-lua", -- Neovim Lua API
+    "saadparwaiz1/cmp_luasnip", -- LuaSnip
 
     -- Сниппеты
     {
@@ -103,7 +134,7 @@ return {
     "rafamadriz/friendly-snippets",
 
     -- UI
-    "onsails/lspkind.nvim",       -- Иконки в меню
+    "onsails/lspkind.nvim", -- Иконки в меню
     "nvim-tree/nvim-web-devicons",
 
     -- Emoji и Nerdfont
@@ -115,28 +146,9 @@ return {
       end,
     },
 
-    -- AI источники
-    {
-      "supermaven-inc/supermaven-nvim",
-      config = function()
-        require("supermaven-nvim").setup({
-          keymaps = {
-            accept_suggestion = "<C-y>",
-            clear_suggestion = "<C-]>",
-            accept_word = "<C-l>",
-          },
-          ignore_filetypes = {},
-          color = {
-            suggestion_color = "#d787ff",
-            cterm = 244,
-          },
-          disable_inline_completion = false, -- false = inline подсказки включены
-          disable_keymaps = false,
-        })
-      end,
-    },
-
-    -- Codeium источник для nvim-cmp
+    -- AI источники (настраиваются в отдельных файлах)
+    -- supermaven.lua уже настраивает supermaven-nvim
+    -- здесь только Codeium для nvim-cmp
     {
       "Exafunction/codeium.nvim",
       config = function()
@@ -300,50 +312,58 @@ return {
       }),
 
       -- ═══════════════════════════════════════════════════════════════
-      -- ФОРМАТИРОВАНИЕ ЭЛЕМЕНТОВ МЕНЮ
+      -- ФОРМАТИРОВАНИЕ ЭЛЕМЕНТОВ МЕНЮ (стиль blink-cmp)
       -- ═══════════════════════════════════════════════════════════════
       formatting = {
+        -- Порядок: иконка типа | текст | иконка источника
         fields = { "kind", "abbr", "menu" },
-        format = lspkind.cmp_format({
-          mode = "symbol_text",
-          maxwidth = 50,
-          ellipsis_char = "...",
-          show_labelDetails = true,
+        format = function(entry, vim_item)
+          local kind = vim_item.kind
+          local source_name = entry.source.name
 
-          before = function(entry, vim_item)
-            -- Кастомные иконки для типов
-            vim_item.kind = string.format("%s %s", kind_icons[vim_item.kind] or "", vim_item.kind)
-
-            -- Название источника
-            vim_item.menu = source_names[entry.source.name] or entry.source.name
-
-            -- Для путей - показываем иконку файла
-            if entry.source.name == "path" then
-              local icon, hl_group = require("nvim-web-devicons").get_icon(entry:get_completion_item().label)
-              if icon then
-                vim_item.kind = icon
-                vim_item.kind_hl_group = hl_group
-              end
+          -- Для путей - показываем иконку файла вместо kind
+          if source_name == "path" then
+            local icon, hl_group = require("nvim-web-devicons").get_icon(entry:get_completion_item().label)
+            if icon then
+              vim_item.kind = icon .. " "
+              vim_item.kind_hl_group = hl_group
+            else
+              vim_item.kind = (kind_icons[kind] or "󰈙") .. " "
             end
+          else
+            -- Иконка типа слева
+            vim_item.kind = (kind_icons[kind] or kind_icons.Text) .. " "
+          end
 
-            return vim_item
-          end,
-        }),
+          -- Ограничиваем длину текста
+          if #vim_item.abbr > 50 then
+            vim_item.abbr = vim_item.abbr:sub(1, 47) .. "..."
+          end
+
+          -- Иконка источника справа + highlight группа
+          local source_icon = source_icons[source_name] or "󰋽"
+          vim_item.menu = " " .. source_icon
+
+          -- Устанавливаем highlight группу для иконки источника
+          vim_item.menu_hl_group = "CmpItemMenu" .. (source_name:gsub("^%l", string.upper):gsub("_", ""))
+
+          return vim_item
+        end,
       },
 
       -- ═══════════════════════════════════════════════════════════════
       -- ИСТОЧНИКИ АВТОДОПОЛНЕНИЯ (по приоритету)
       -- ═══════════════════════════════════════════════════════════════
       sources = cmp.config.sources({
-        { name = "emoji",      priority = 15, max_item_count = 20 },
-        { name = "nerdfont",   priority = 15, max_item_count = 20 },
+        { name = "emoji", priority = 15, max_item_count = 20 },
+        { name = "nerdfont", priority = 15, max_item_count = 20 },
         { name = "supermaven", priority = 12, max_item_count = 5 },
-        { name = "codeium",    priority = 11, max_item_count = 5 },
-        { name = "nvim_lsp",   priority = 10, max_item_count = 20 },
-        { name = "luasnip",    priority = 9,  max_item_count = 10 },
-        { name = "nvim_lua",   priority = 8 },
-        { name = "path",       priority = 3,  max_item_count = 10 },
-        { name = "buffer",     priority = 1,  max_item_count = 10, keyword_length = 3 },
+        { name = "codeium", priority = 11, max_item_count = 5 },
+        { name = "nvim_lsp", priority = 10, max_item_count = 20 },
+        { name = "luasnip", priority = 9, max_item_count = 10 },
+        { name = "nvim_lua", priority = 8 },
+        { name = "path", priority = 3, max_item_count = 10 },
+        { name = "buffer", priority = 1, max_item_count = 10, keyword_length = 3 },
       }),
 
       -- ═══════════════════════════════════════════════════════════════
@@ -403,20 +423,60 @@ return {
     })
 
     -- ═══════════════════════════════════════════════════════════════
-    -- ЦВЕТОВАЯ СХЕМА
+    -- ЦВЕТОВАЯ СХЕМА (стиль blink-cmp)
     -- ═══════════════════════════════════════════════════════════════
+
+    -- Основные цвета меню
     vim.api.nvim_set_hl(0, "CmpPmenu", { bg = "#1a1b26", fg = "#c0caf5" })
     vim.api.nvim_set_hl(0, "CmpSel", { bg = "#283457", bold = true })
     vim.api.nvim_set_hl(0, "CmpDoc", { bg = "#1a1b26", fg = "#c0caf5" })
+    vim.api.nvim_set_hl(0, "CmpBorder", { fg = "#7aa2f7", bg = "#1a1b26" })
     vim.api.nvim_set_hl(0, "CmpGhostText", { fg = "#565f89", italic = true })
 
-    -- Границы
-    vim.api.nvim_set_hl(0, "CmpBorder", { fg = "#7aa2f7", bg = "#1a1b26" })
+    -- Цвета для типов (Kind) - полная палитра
+    vim.api.nvim_set_hl(0, "CmpItemKindText", { fg = "#9aa5ce" })
+    vim.api.nvim_set_hl(0, "CmpItemKindMethod", { fg = "#7aa2f7" })
+    vim.api.nvim_set_hl(0, "CmpItemKindFunction", { fg = "#bb9af7" })
+    vim.api.nvim_set_hl(0, "CmpItemKindConstructor", { fg = "#f7768e" })
+    vim.api.nvim_set_hl(0, "CmpItemKindField", { fg = "#73daca" })
+    vim.api.nvim_set_hl(0, "CmpItemKindVariable", { fg = "#c0caf5" })
+    vim.api.nvim_set_hl(0, "CmpItemKindClass", { fg = "#ff9e64" })
+    vim.api.nvim_set_hl(0, "CmpItemKindInterface", { fg = "#73daca" })
+    vim.api.nvim_set_hl(0, "CmpItemKindModule", { fg = "#ff9e64" })
+    vim.api.nvim_set_hl(0, "CmpItemKindProperty", { fg = "#73daca" })
+    vim.api.nvim_set_hl(0, "CmpItemKindUnit", { fg = "#ff9e64" })
+    vim.api.nvim_set_hl(0, "CmpItemKindValue", { fg = "#9ece6a" })
+    vim.api.nvim_set_hl(0, "CmpItemKindEnum", { fg = "#ff9e64" })
+    vim.api.nvim_set_hl(0, "CmpItemKindKeyword", { fg = "#bb9af7" })
+    vim.api.nvim_set_hl(0, "CmpItemKindSnippet", { fg = "#e0af68" })
+    vim.api.nvim_set_hl(0, "CmpItemKindColor", { fg = "#9ece6a" })
+    vim.api.nvim_set_hl(0, "CmpItemKindFile", { fg = "#7aa2f7" })
+    vim.api.nvim_set_hl(0, "CmpItemKindReference", { fg = "#7aa2f7" })
+    vim.api.nvim_set_hl(0, "CmpItemKindFolder", { fg = "#e0af68" })
+    vim.api.nvim_set_hl(0, "CmpItemKindEnumMember", { fg = "#73daca" })
+    vim.api.nvim_set_hl(0, "CmpItemKindConstant", { fg = "#ff9e64" })
+    vim.api.nvim_set_hl(0, "CmpItemKindStruct", { fg = "#ff9e64" })
+    vim.api.nvim_set_hl(0, "CmpItemKindEvent", { fg = "#ff9e64" })
+    vim.api.nvim_set_hl(0, "CmpItemKindOperator", { fg = "#bb9af7" })
+    vim.api.nvim_set_hl(0, "CmpItemKindTypeParameter", { fg = "#73daca" })
 
     -- AI источники (Kind)
     vim.api.nvim_set_hl(0, "CmpItemKindSupermaven", { fg = "#d787ff", bold = true })
     vim.api.nvim_set_hl(0, "CmpItemKindCodeium", { fg = "#09b6a2", bold = true })
     vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6cc644", bold = true })
+    vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#f7768e" })
+
+    -- Цвета для иконок источников (справа)
+    vim.api.nvim_set_hl(0, "CmpItemMenuNvimLsp", { fg = "#7aa2f7" }) -- LSP - синий
+    vim.api.nvim_set_hl(0, "CmpItemMenuSupermaven", { fg = "#d787ff", bold = true }) -- Supermaven - фиолетовый
+    vim.api.nvim_set_hl(0, "CmpItemMenuCodeium", { fg = "#09b6a2", bold = true }) -- Codeium - бирюзовый
+    vim.api.nvim_set_hl(0, "CmpItemMenuLuasnip", { fg = "#e0af68" }) -- Сниппеты - желтый
+    vim.api.nvim_set_hl(0, "CmpItemMenuBuffer", { fg = "#565f89" }) -- Буфер - серый
+    vim.api.nvim_set_hl(0, "CmpItemMenuPath", { fg = "#e0af68" }) -- Путь - желтый
+    vim.api.nvim_set_hl(0, "CmpItemMenuEmoji", { fg = "#f7768e" }) -- Эмодзи - розовый
+    vim.api.nvim_set_hl(0, "CmpItemMenuNerdfont", { fg = "#bb9af7" }) -- Nerd Font - фиолетовый
+    vim.api.nvim_set_hl(0, "CmpItemMenuNvimLua", { fg = "#7aa2f7" }) -- Lua API - синий
+    vim.api.nvim_set_hl(0, "CmpItemMenuCmdline", { fg = "#9aa5ce" }) -- Cmd - светло-серый
 
     -- Настройки
     vim.opt.completeopt = { "menu", "menuone", "noselect" }

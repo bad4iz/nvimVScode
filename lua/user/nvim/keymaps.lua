@@ -97,9 +97,9 @@ keymap("n", "[b", "<cmd>bprevious<CR>", { desc = "Предыдущий буфе�
 keymap("n", "]b", "<cmd>bnext<CR>", { desc = "Следующий буфер" })
 keymap("n", "<leader>bp", "<cmd>bprevious<CR>", { desc = "Предыдущий буфер" })
 
--- Закрытие буфера
-keymap("n", "<leader>c", "<cmd>bdelete<CR>", { desc = "Закрыть буфер" })
-keymap("n", "<leader>C", "<cmd>bdelete!<CR>", { desc = "Принудительно закрыть буфер" })
+-- Закрытие буфера (умное удаление через Snacks)
+keymap("n", "<leader>c", function() require("snacks").bufdelete() end, { desc = "Закрыть буфер" })
+keymap("n", "<leader>C", function() require("snacks").bufdelete({ force = true }) end, { desc = "Принудительно закрыть буфер" })
 
 -- =====================================================================
 -- ТАБЫ (Neovim only)

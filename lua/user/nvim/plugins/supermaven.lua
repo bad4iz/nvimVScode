@@ -24,7 +24,7 @@
 return {
   "supermaven-inc/supermaven-nvim",
   config = function()
-    require("supermaven-nvim").setup {
+    require("supermaven-nvim").setup({
       keymaps = {
         accept_suggestion = "<C-g>", -- Принять inline подсказку
         clear_suggestion = "<C-]>", -- Очистить inline подсказку
@@ -32,13 +32,13 @@ return {
       },
       ignore_filetypes = {},
       color = {
-        suggestion_color = "#d787ff", 
+        suggestion_color = "#d787ff",
         cterm = 244,
       },
       log_level = "off",
       disable_inline_completion = false, -- false = inline включены
       disable_keymaps = false,
-    }
+    })
 
     -- Стиль inline подсказок: курсив + фиолетовый цвет
     -- Применяем после загрузки плагина через autocmd

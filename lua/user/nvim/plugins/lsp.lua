@@ -210,12 +210,20 @@ return {
     -- Настройка возможностей клиента (capabilities)
     -- Расширяем стандартные возможности для поддержки автодополнения
     -- ========================================================================
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    -- Если установлен cmp-nvim-lsp, добавляем его возможности
-    local has_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-    if has_cmp then
-      capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
-    end
+    -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+    -- -- Используем blink.cmp для автодополнения (новый движок)
+    -- -- Если blink.cmp загружен, добавляем его возможности
+    -- local has_blink, blink_cmp = pcall(require, "blink.cmp")
+    -- if has_blink then
+    --   capabilities = vim.tbl_deep_extend("force", capabilities, blink_cmp.get_lsp_capabilities())
+    -- else
+    --   -- Fallback на старый cmp_nvim_lsp если blink не загружен
+    --   local has_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+    --   if has_cmp then
+    --     capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
+    --   end
+    -- end
+    
 
     -- ========================================================================
     -- Список LSP серверов и их настройки

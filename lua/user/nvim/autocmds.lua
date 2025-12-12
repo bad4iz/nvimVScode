@@ -161,4 +161,53 @@ autocmd("LspAttach", {
   desc = "Настройки при подключении LSP",
 })
 
+-- =====================================================================
+-- АВТОЗАКРЫТИЕ СПЕЦИАЛЬНЫХ БУФЕРОВ
+-- =====================================================================
+autocmd("BufDelete", {
+  group = augroup("auto_close_special_buffers", { clear = true }),
+  callback = function()
+    vim.schedule(function()
+      -- Список специальных буферов для закрытия
+      local special_buffers = { "coder_claudecode" }
+
+      -- Проверяем, остались ли обычные буферы
+      local has_normal_buffers = false
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+          local bufname = vim.api.nvim_buf_get_name(buf)
+          local filetype = vim.bo[buf].filetype
+
+          -- Игнорируем специальные буферы
+          local is_special = filetype == "neo-tree"
+            or filetype == "snacks_dashboard"
+            or filetype == "alpha"
+            or filetype == "dashboard"
+            or bufname:match("coder_claudecode")
+
+          if not is_special then
+            has_normal_buffers = true
+            break
+          end
+        end
+      end
+
+      -- Если нет обычных буферов, закрываем специальные
+      if not has_normal_buffers then
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          if vim.api.nvim_buf_is_valid(buf) then
+            local bufname = vim.api.nvim_buf_get_name(buf)
+            for _, pattern in ipairs(special_buffers) do
+              if bufname:match(pattern) then
+                pcall(vim.api.nvim_buf_delete, buf, { force = false })
+              end
+            end
+          end
+        end
+      end
+    end)
+  end,
+  desc = "Автоматически закрывать специальные буферы когда нет обычных",
+})
+
 print("✓ Автокоманды загружены")

@@ -110,7 +110,7 @@ return {
     -- =====================================================================
 
     -- Закрывать Neo-tree если это последнее окно
-    close_if_last_window = false,
+    close_if_last_window = true,
 
     -- Стиль границы окна (пустая строка для winborder на Neovim v0.11+)
     popup_border_style = "rounded",

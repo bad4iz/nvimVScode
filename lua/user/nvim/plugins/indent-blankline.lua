@@ -13,24 +13,28 @@ GitHub: https://github.com/lukas-reineke/indent-blankline.nvim
 =====================================================================
 --]]
 
+if true then
+  return {}
+end -- WARN: УДАЛИТЕ ЭТУ СТРОКУ ДЛЯ АКТИВАЦИИ TELESCOPE
+
 return {
   "lukas-reineke/indent-blankline.nvim",
   event = { "BufReadPost", "BufNewFile" },
   main = "ibl",
-  
+
   opts = {
     indent = {
       char = "│",
       tab_char = "│",
     },
-    
+
     scope = {
       enabled = true,
       char = "│",
       show_start = true,
       show_end = true,
     },
-    
+
     exclude = {
       filetypes = {
         "help",

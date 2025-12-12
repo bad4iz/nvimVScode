@@ -22,7 +22,7 @@ return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
   dependencies = { "nvim-tree/nvim-web-devicons" },
-  
+
   opts = function()
     -- Цвета из tokyonight
     local colors = {
@@ -37,35 +37,35 @@ return {
       blue = "#7aa2f7",
       red = "#f7768e",
     }
-    
+
     -- Компонент для отображения статуса Supermaven
     local function supermaven_status()
       local ok, api = pcall(require, "supermaven-nvim.api")
       if ok and api.is_running() then
-        return " " -- Иконка AI
+        return "󱚞" -- Иконка AI
       end
-      return ""
+      return "󱙻"
     end
-    
+
     -- Компонент для отображения LSP серверов
     local function lsp_clients()
       local clients = vim.lsp.get_clients({ bufnr = 0 })
       if #clients == 0 then
         return ""
       end
-      
+
       local names = {}
       for _, client in ipairs(clients) do
         table.insert(names, client.name)
       end
-      
-      return " " .. table.concat(names, ", ")
+
+      return "󱒊" .. table.concat(names, ", ")
     end
-    
+
     return {
       options = {
         theme = "tokyonight",
-        globalstatus = false,
+        globalstatus = true,
         disabled_filetypes = {
           statusline = { "dashboard", "alpha", "starter" },
           winbar = {},
@@ -73,7 +73,7 @@ return {
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
       },
-      
+
       sections = {
         -- ═══════════════════════════════════════════════════════════
         -- ЛЕВАЯ ЧАСТЬ
@@ -97,46 +97,52 @@ return {
             end,
           },
         },
-        
+
         lualine_b = {
           {
             "branch",
+            fmt = function(str)
+              if vim.fn.strchars(str) > 30 then
+                return vim.fn.strcharpart(str, 0, 27) .. "…"
+              end
+              return str
+            end,
           },
           {
             "diff",
             symbols = {
-              added = " ",
-              modified = " ",
-              removed = " ",
+              added = "",
+              modified = "󱧃",
+              removed = "󱀭",
             },
             colored = true,
           },
         },
-        
+
         lualine_c = {
           {
             "diagnostics",
             sources = { "nvim_diagnostic" },
             symbols = {
-              error = " ",
-              warn = " ",
-              info = "󰋼 ",
-              hint = "󰌵 ",
+              Error = "", -- Ошибка
+              Warn = "", -- Предупреждение
+              Hint = "󰌵", -- Подсказка
+              Info = "", -- Информация
             },
           },
           { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
           {
             "filename",
-            path = 1, -- Относительный путь
+            path = 0, -- Только имя файла без пути
             symbols = {
-              modified = " ●",
-              readonly = " ",
+              modified = "󱧃",
+              readonly = "",
               unnamed = "[Без имени]",
               newfile = "[Новый]",
             },
           },
         },
-        
+
         -- ═══════════════════════════════════════════════════════════
         -- ПРАВАЯ ЧАСТЬ
         -- ═══════════════════════════════════════════════════════════
@@ -152,29 +158,29 @@ return {
             color = { fg = colors.cyan },
           },
           -- Отступы (пробелы/табы)
-          {
-            function()
-              local space = vim.bo.expandtab and "Пробелы" or "Табы"
-              return space .. ":" .. vim.bo.shiftwidth
-            end,
-            cond = function()
-              return vim.bo.filetype ~= ""
-            end,
-          },
+          -- {
+          --   function()
+          --     local space = vim.bo.expandtab and "Пробелы" or "Табы"
+          --     return space .. ":" .. vim.bo.shiftwidth
+          --   end,
+          --   cond = function()
+          --     return vim.bo.filetype ~= ""
+          --   end,
+          -- },
         },
-        
+
         lualine_y = {
           { "encoding", show_bomb = true },
           { "fileformat", icons_enabled = true },
           { "filetype" },
         },
-        
+
         lualine_z = {
           { "progress" },
           { "location" },
         },
       },
-      
+
       -- ═══════════════════════════════════════════════════════════
       -- НЕАКТИВНЫЕ ОКНА
       -- ═══════════════════════════════════════════════════════════
@@ -186,7 +192,7 @@ return {
         lualine_y = {},
         lualine_z = {},
       },
-      
+
       -- ═══════════════════════════════════════════════════════════
       -- РАСШИРЕНИЯ
       -- ═══════════════════════════════════════════════════════════

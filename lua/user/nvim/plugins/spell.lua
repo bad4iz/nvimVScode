@@ -192,8 +192,10 @@ return {
 
           if #missing > 0 then
             vim.notify(
-              "⚠ Словари не найдены: " .. table.concat(missing, ", ") .. "\n" ..
-              "Используйте :SpellInstall для установки",
+              "⚠ Словари не найдены: "
+                .. table.concat(missing, ", ")
+                .. "\n"
+                .. "Используйте :SpellInstall для установки",
               vim.log.levels.WARN,
               { title = "Spell Checking" }
             )
@@ -221,10 +223,16 @@ return {
         local lang = opts.args ~= "" and opts.args or "all"
 
         if lang == "all" then
-          vim.notify("📥 Установка словарей для русского и английского языков...", vim.log.levels.INFO)
+          vim.notify(
+            "📥 Установка словарей для русского и английского языков...",
+            vim.log.levels.INFO
+          )
           download_spell_file("en")
           download_spell_file("ru")
-          vim.notify("✓ Установка завершена! Перезапустите Neovim.", vim.log.levels.INFO)
+          vim.notify(
+            "✓ Установка завершена! Перезапустите Neovim.",
+            vim.log.levels.INFO
+          )
         else
           download_spell_file(lang)
           vim.notify("✓ Словарь установлен для: " .. lang, vim.log.levels.INFO)
@@ -252,7 +260,9 @@ return {
           "  Английский: " .. (en_exists and "✓" or "✗ НЕ УСТАНОВЛЕН"),
           "  Русский: " .. (ru_exists and "✓" or "✗ НЕ УСТАНОВЛЕН"),
           "",
-          not (en_exists and ru_exists) and "⚠ Используйте :SpellInstall для установки словарей" or "",
+          not (en_exists and ru_exists)
+              and "⚠ Используйте :SpellInstall для установки словарей"
+            or "",
           "",
           "Горячие клавиши:",
           "  <leader>us  - включить/выключить",

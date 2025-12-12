@@ -26,102 +26,111 @@ return {
   "akinsho/bufferline.nvim",
   event = "VeryLazy",
   dependencies = { "nvim-tree/nvim-web-devicons" },
-  
+
   config = function()
     require("bufferline").setup({
       options = {
         -- Режим отображения
         mode = "buffers",
-        
+
         -- Стиль
         style_preset = require("bufferline").style_preset.default,
         themable = true,
-        
+
         -- Номера буферов
         numbers = function(opts)
           return string.format("%s", opts.ordinal)
         end,
-        
+
         -- Кнопка закрытия
         close_command = function(n)
           local ok, snacks = pcall(require, "snacks")
-          if ok then snacks.bufdelete(n) else vim.cmd("bdelete! " .. n) end
+          if ok then
+            snacks.bufdelete(n)
+          else
+            vim.cmd("bdelete! " .. n)
+          end
         end,
         right_mouse_command = function(n)
           local ok, snacks = pcall(require, "snacks")
-          if ok then snacks.bufdelete(n) else vim.cmd("bdelete! " .. n) end
+          if ok then
+            snacks.bufdelete(n)
+          else
+            vim.cmd("bdelete! " .. n)
+          end
         end,
-        
+
         -- Индикаторы
         indicator = {
           icon = "▎",
           style = "icon",
         },
-        
+
         -- Иконки
         buffer_close_icon = "󰅖",
         modified_icon = "●",
         close_icon = "",
         left_trunc_marker = "",
         right_trunc_marker = "",
-        
+
         -- Максимальная длина имени
         max_name_length = 30,
         max_prefix_length = 30,
         truncate_names = true,
-        
+
         -- Отступы от краёв
         tab_size = 21,
-        
+
         -- Диагностика
         diagnostics = "nvim_lsp",
         diagnostics_update_in_insert = false,
         diagnostics_indicator = function(count, level)
           local icons = {
-            error = " ",
-            warning = " ",
-            info = " ",
-            hint = " ",
+
+            error = "",
+            warn = " ",
+            info = " ",
+            hint = " ",
           }
           return " " .. (icons[level] or "") .. count
         end,
-        
+
         -- Смещение для neo-tree
         offsets = {
           {
             filetype = "neo-tree",
-            text = "󰉓 Файлы",
+            text = "󰉓  Файлы",
             text_align = "center",
             separator = true,
             highlight = "Directory",
           },
         },
-        
+
         -- Разделители
         separator_style = "thin",
-        
+
         -- Закреплённые буферы
         always_show_bufferline = true,
-        
+
         -- Сортировка
         sort_by = "insert_after_current",
-        
+
         -- Показывать закрытие только для текущего
         show_buffer_close_icons = true,
         show_close_icon = false,
         show_tab_indicators = true,
         show_duplicate_prefix = true,
-        
+
         -- Цвета
         color_icons = true,
-        
+
         -- Hover эффекты
         hover = {
           enabled = true,
           delay = 200,
           reveal = { "close" },
         },
-        
+
         -- Группы буферов
         groups = {
           items = {
@@ -130,7 +139,7 @@ return {
         },
       },
     })
-    
+
     -- Исправление перехода буферов при удалении
     vim.api.nvim_create_autocmd("BufDelete", {
       callback = function(event)
@@ -140,7 +149,7 @@ return {
       end,
     })
   end,
-  
+
   keys = {
     { "<S-h>", "<cmd>BufferLineCyclePrev<cr>", desc = "Предыдущий буфер" },
     { "<S-l>", "<cmd>BufferLineCycleNext<cr>", desc = "Следующий буфер" },

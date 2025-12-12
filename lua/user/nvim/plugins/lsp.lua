@@ -248,22 +248,30 @@ return {
         },
       },
 
-      -- TypeScript/JavaScript (веб-разработка)
-      ts_ls = {
+      -- TypeScript/JavaScript (vtsls - улучшенная версия от команды Vue)
+      vtsls = {
         settings = {
           typescript = {
             -- Подсказки для параметров функций
             inlayHints = {
-              includeInlayParameterNameHints = "all",
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
+              parameterNames = { enabled = "all" },
+              parameterTypes = { enabled = true },
+              variableTypes = { enabled = true },
+              propertyDeclarationTypes = { enabled = true },
+              functionLikeReturnTypes = { enabled = true },
+            },
+            -- Preferences
+            preferences = {
+              importModuleSpecifier = "relative",
             },
           },
           javascript = {
             inlayHints = {
-              includeInlayParameterNameHints = "all",
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
+              parameterNames = { enabled = "all" },
+              parameterTypes = { enabled = true },
+              variableTypes = { enabled = true },
+              propertyDeclarationTypes = { enabled = true },
+              functionLikeReturnTypes = { enabled = true },
             },
           },
         },
@@ -300,9 +308,6 @@ return {
 
       -- CSS/SCSS/LESS
       cssls = {},
-
-      -- Tailwind CSS (автодополнение классов)
-      tailwindcss = {},
 
       -- ESLint (линтер для JS/TS)
       eslint = {

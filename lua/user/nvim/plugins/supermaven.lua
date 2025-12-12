@@ -1,7 +1,7 @@
 --[[
   Supermaven AI - работает в ДВУХ режимах одновременно
 
-  1. INLINE ПОДСКАЗКИ (серый #6e7681 + курсив):
+  1. INLINE ПОДСКАЗКИ ( + курсив):
      - Показывает предложения справа от курсора
      - Стиль GitHub Copilot - не отвлекает от кода
      - Горячие клавиши:
@@ -13,12 +13,9 @@
      - Подсказки в меню автодополнения
      - Легко сравнить с Codeium (бирюзовый) и LSP (обычный)
      - Иконка: 󱙺 Supermaven (робот = AI помощник)
-     - Настроено в: lua/plugins/cmp.lua:24-27, 32
 
   ЦВЕТОВАЯ СХЕМА:
-  - Supermaven inline = СЕРЫЙ (#6e7681) + курсив (GitHub Copilot style)
   - Supermaven в cmp = ФИОЛЕТОВЫЙ (#d787ff)
-  - Codeium в cmp = БИРЮЗОВЫЙ (#00d7af)
   - LSP = обычный цвет
 --]]
 return {
@@ -40,22 +37,30 @@ return {
       disable_keymaps = false,
     })
 
-    -- Стиль inline подсказок: курсив + фиолетовый цвет
-    -- Применяем после загрузки плагина через autocmd
-    vim.api.nvim_create_autocmd("ColorScheme", {
+    -- ФИКС: Устанавливаем highlight группу напрямую
+    -- Плагин по умолчанию использует "Comment" (серый), нужно переопределить
+    local function setup_highlights()
+      -- Устанавливаем цвет и курсив
+      vim.api.nvim_set_hl(0, "SupermavenSuggestion", {
+        fg = "#d787ff",
+        ctermfg = 244,
+        italic = true,
+      })
+
+      -- Указываем плагину использовать нашу highlight группу
+      local ok, preview = pcall(require, "supermaven-nvim.completion_preview")
+      if ok then
+        preview.suggestion_group = "SupermavenSuggestion"
+      end
+    end
+
+    -- Применяем при загрузке и смене цветовой схемы
+    vim.api.nvim_create_autocmd({ "VimEnter", "ColorScheme" }, {
       pattern = "*",
-      callback = function()
-        vim.api.nvim_set_hl(0, "SupermavenSuggestion", {
-          fg = "#d787ff",
-          italic = true,
-        })
-      end,
+      callback = setup_highlights,
     })
 
-    -- Применяем сразу
-    vim.api.nvim_set_hl(0, "SupermavenSuggestion", {
-      fg = "#d787ff",
-      italic = true,
-    })
+    -- Применяем сразу с задержкой (плагин должен загрузиться)
+    vim.schedule(setup_highlights)
   end,
 }

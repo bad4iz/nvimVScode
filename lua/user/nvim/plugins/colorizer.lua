@@ -17,9 +17,6 @@ return {
     -- Включить именованные цвета (red, blue, green и т.д.)
     enable_named_colors = true,
 
-    -- Включить поддержку tailwind цветов (bg-blue-500 и т.д.)
-    enable_tailwind = true,
-
     -- Какие цветовые форматы распознавать
     -- 'hex', 'rgb', 'hsl', 'css_rgb', 'css_hsl', 'css_fn'
     -- Пример: '#d787ff', 'rgb(215,135,255)', 'hsl(280,100%,76%)'

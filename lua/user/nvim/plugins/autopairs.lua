@@ -24,6 +24,7 @@ GitHub: https://github.com/windwp/nvim-autopairs
 
 return {
   "windwp/nvim-autopairs",
+  enabled = false, -- Выключено - autopairs настроен в nvim-cmp.lua
   event = "InsertEnter",
   
   opts = {

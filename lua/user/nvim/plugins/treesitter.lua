@@ -93,11 +93,7 @@ return {
       "tsx",
       "json",
       "jsonc",
-      
-      -- React/Vue/Svelte
-      "vue",
-      "svelte",
-      
+
       -- Конфигурационные файлы
       "yaml",
       "toml",

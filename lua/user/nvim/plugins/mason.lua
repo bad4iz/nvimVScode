@@ -30,10 +30,10 @@ return {
     },
     
     ensure_installed = {
-      -- LSP серверы (vtsls исключён - используется typescript-tools.nvim)
+      -- LSP серверы
+      "vtsls", -- TypeScript/JavaScript LSP (улучшенная версия)
       "html-lsp",
       "css-lsp",
-      "tailwindcss-language-server",
       "json-lsp",
       "yaml-language-server",
       "lua-language-server",

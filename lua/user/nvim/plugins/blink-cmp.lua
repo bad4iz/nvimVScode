@@ -99,6 +99,7 @@ local source_icons = {
 
 return {
   "saghen/blink.cmp",
+  enabled = false, -- Выключено для сравнения с nvim-cmp
   version = "*",
   event = "InsertEnter",
   

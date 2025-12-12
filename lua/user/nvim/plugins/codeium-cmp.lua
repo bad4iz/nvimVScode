@@ -10,6 +10,7 @@ GitHub: https://github.com/Exafunction/codeium.nvim
 
 return {
   "Exafunction/codeium.nvim",
+  enabled = false, -- Выключено - codeium настроен в nvim-cmp.lua
   event = "InsertEnter",
   dependencies = {
     "nvim-lua/plenary.nvim",

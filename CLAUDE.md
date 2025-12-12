@@ -44,7 +44,7 @@ Lock-файл: `lazy-lock.json`
 
 ### LSP (lua/user/nvim/plugins/lsp.lua + mason.lua)
 - **Mason** автоматически устанавливает LSP серверы
-- Серверы: `vtsls` (TypeScript), `html`, `css`, `tailwindcss`, `jsonls`, `yamlls`, `lua_ls`, `eslint`, `emmet`, `marksman` (Markdown)
+- Серверы: `vtsls` (TypeScript/JavaScript, улучшенная версия), `html`, `css`, `jsonls`, `yamlls`, `lua_ls`, `eslint`, `emmet`, `marksman` (Markdown)
 - Команды: `:Mason`, `:LspInfo`
 
 ### Автодополнение (blink-cmp.lua)

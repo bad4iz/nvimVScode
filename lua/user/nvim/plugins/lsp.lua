@@ -223,7 +223,6 @@ return {
     --     capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
     --   end
     -- end
-    
 
     -- ========================================================================
     -- Список LSP серверов и их настройки

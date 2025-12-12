@@ -18,7 +18,7 @@ return {
   "williamboman/mason.nvim",
   cmd = "Mason",
   build = ":MasonUpdate",
-  
+
   opts = {
     ui = {
       icons = {
@@ -28,7 +28,7 @@ return {
       },
       border = "rounded",
     },
-    
+
     ensure_installed = {
       -- LSP серверы
       "vtsls", -- TypeScript/JavaScript LSP (улучшенная версия)
@@ -37,7 +37,7 @@ return {
       "json-lsp",
       "yaml-language-server",
       "lua-language-server",
-      "eslint-lsp",
+      -- "eslint-lsp",
       "emmet-ls",
       "marksman", -- Markdown LSP
 
@@ -49,10 +49,10 @@ return {
       "eslint_d",
     },
   },
-  
+
   config = function(_, opts)
     require("mason").setup(opts)
-    
+
     -- Автоматически устанавливаем инструменты
     local mr = require("mason-registry")
     for _, tool in ipairs(opts.ensure_installed or {}) do

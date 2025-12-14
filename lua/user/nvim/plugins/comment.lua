@@ -4,23 +4,25 @@
 =====================================================================
 Умное комментирование кода с поддержкой treesitter.
 
-Горячие клавиши:
-  gcc         - закомментировать/раскомментировать строку
-  gc{motion}  - закомментировать по motion (например: gcap - параграф)
-  gbc         - блочный комментарий строки
-  gb{motion}  - блочный комментарий по motion
-  
+Горячие клавиши (AstroNvim style):
+  gcc          - закомментировать/раскомментировать строку
+  gc{motion}   - закомментировать по motion (например: gcap - параграф)
+  gbc          - блочный комментарий строки
+  gb{motion}   - блочный комментарий по motion
+  <leader>/    - toggle comment line (дополнительный mapping)
+
 В визуальном режиме:
-  gc          - закомментировать выделение
-  gb          - блочный комментарий выделения
+  gc           - закомментировать выделение
+  gb           - блочный комментарий выделения
+  <leader>/    - toggle comment (дополнительный mapping)
 
 Примеры:
-  gcc     - // строка
-  gcip    - закомментировать параграф
-  gc5j    - закомментировать 5 строк вниз
-  gco     - добавить комментарий на следующей строке
-  gcO     - добавить комментарий на предыдущей строке
-  gcA     - добавить комментарий в конец строки
+  gcc      - // строка
+  gcip     - закомментировать параграф
+  gc5j     - закомментировать 5 строк вниз
+  gco      - добавить комментарий на следующей строке
+  gcO      - добавить комментарий на предыдущей строке
+  gcA      - добавить комментарий в конец строки
 
 GitHub: https://github.com/numToStr/Comment.nvim
 =====================================================================
@@ -29,7 +31,13 @@ GitHub: https://github.com/numToStr/Comment.nvim
 return {
   "numToStr/Comment.nvim",
   event = { "BufReadPost", "BufNewFile" },
-  
+
+  -- Дополнительные маппинги (AstroNvim style: <leader>/)
+  keys = {
+    { "<leader>/", mode = "n", function() return vim.v.count == 0 and "<Plug>(comment_toggle_linewise_current)" or "<Plug>(comment_toggle_linewise_count)" end, expr = true, desc = "Toggle comment line" },
+    { "<leader>/", mode = "x", "<Plug>(comment_toggle_linewise_visual)", desc = "Toggle comment" },
+  },
+
   dependencies = {
     -- Для определения типа комментария в смешанных файлах (JSX, Vue и т.д.)
     {
@@ -51,24 +59,24 @@ return {
       
       -- Игнорировать пустые строки
       ignore = "^$",
-      
-      -- Маппинги (в стиле AstroNvim с Leader)
+
+      -- Маппинги (в стиле AstroNvim - gcc, gbc)
       toggler = {
-        line = "<Leader>/",  -- Строчный комментарий
-        block = "<Leader>?", -- Блочный комментарий
+        line = "gcc",  -- Строчный комментарий (AstroNvim default)
+        block = "gbc", -- Блочный комментарий (AstroNvim default)
       },
-      
+
       opleader = {
-        line = "<Leader>/",   -- Строчный для motion
-        block = "<Leader>?",  -- Блочный для motion
+        line = "gc",  -- Строчный для motion (AstroNvim default)
+        block = "gb", -- Блочный для motion (AstroNvim default)
       },
-      
+
       extra = {
-        above = "<Leader>gO", -- Добавить комментарий сверху
-        below = "<Leader>go", -- Добавить комментарий снизу
-        eol = "<Leader>gA",   -- Добавить комментарий в конец
+        above = "gcO", -- Добавить комментарий сверху
+        below = "gco", -- Добавить комментарий снизу
+        eol = "gcA",   -- Добавить комментарий в конец
       },
-      
+
       -- Включить основные маппинги
       mappings = {
         basic = true,

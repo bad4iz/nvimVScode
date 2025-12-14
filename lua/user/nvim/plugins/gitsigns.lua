@@ -9,19 +9,21 @@ Git интеграция: знаки изменений, blame, hunk опера�
   │  - изменённые строки (жёлтый)
   _  - удалённые строки (красный)
 
-Горячие клавиши:
-  ]h          - следующий hunk (изменение)
-  [h          - предыдущий hunk
-  <leader>hs  - stage hunk (добавить в индекс)
-  <leader>hr  - reset hunk (отменить изменения)
-  <leader>hS  - stage весь буфер
-  <leader>hR  - reset весь буфер
-  <leader>hu  - undo stage hunk
-  <leader>hp  - preview hunk
-  <leader>hb  - blame строки
-  <leader>hB  - blame буфера
-  <leader>hd  - diff текущего файла
-  <leader>hD  - diff против HEAD
+Горячие клавиши (AstroNvim style):
+  ]h           - следующий hunk (изменение)
+  [h           - предыдущий hunk
+  <leader>ghs  - проиндексировать hunk
+  <leader>ghr  - сбросить hunk
+  <leader>ghS  - проиндексировать весь буфер
+  <leader>ghR  - сбросить весь буфер
+  <leader>ghu  - отменить индексацию hunk
+  <leader>ghp  - просмотр hunk
+  <leader>ghb  - blame строки
+  <leader>ghB  - blame буфера
+  <leader>ghd  - diff текущего файла
+  <leader>ghD  - diff против HEAD
+  <leader>ug   - переключить git blame
+  <leader>uG   - переключить показ удалённых строк
 
 GitHub: https://github.com/lewis6991/gitsigns.nvim
 =====================================================================
@@ -121,41 +123,41 @@ return {
         end
       end, { desc = "Предыдущий hunk" })
       
-      -- Действия с hunk'ами
-      map("n", "<leader>hs", gs.stage_hunk, { desc = "Добавить hunk в индекс" })
-      map("n", "<leader>hr", gs.reset_hunk, { desc = "Сбросить hunk" })
-      
-      map("v", "<leader>hs", function()
+      -- Действия с hunk'ами (AstroNvim style: <leader>gh)
+      map("n", "<leader>ghs", gs.stage_hunk, { desc = "Проиндексировать hunk" })
+      map("n", "<leader>ghr", gs.reset_hunk, { desc = "Сбросить hunk" })
+
+      map("v", "<leader>ghs", function()
         gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-      end, { desc = "Добавить выделенный hunk в индекс" })
-      
-      map("v", "<leader>hr", function()
+      end, { desc = "Проиндексировать выделенный hunk" })
+
+      map("v", "<leader>ghr", function()
         gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
       end, { desc = "Сбросить выделенный hunk" })
-      
-      map("n", "<leader>hS", gs.stage_buffer, { desc = "Добавить буфер в индекс" })
-      map("n", "<leader>hR", gs.reset_buffer, { desc = "Сбросить буфер" })
-      map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "Отменить добавление hunk" })
-      map("n", "<leader>hp", gs.preview_hunk, { desc = "Предпросмотр hunk" })
-      
+
+      map("n", "<leader>ghS", gs.stage_buffer, { desc = "Проиндексировать буфер" })
+      map("n", "<leader>ghR", gs.reset_buffer, { desc = "Сбросить буфер" })
+      map("n", "<leader>ghu", gs.undo_stage_hunk, { desc = "Отменить индексацию hunk" })
+      map("n", "<leader>ghp", gs.preview_hunk, { desc = "Просмотр hunk" })
+
       -- Blame
-      map("n", "<leader>hb", function()
+      map("n", "<leader>ghb", function()
         gs.blame_line({ full = true })
-      end, { desc = "Blame строки" })
-      
-      map("n", "<leader>hB", function()
+      end, { desc = "Blame для строки" })
+
+      map("n", "<leader>ghB", function()
         gs.blame()
-      end, { desc = "Blame буфера" })
-      
+      end, { desc = "Blame для буфера" })
+
       -- Diff
-      map("n", "<leader>hd", gs.diffthis, { desc = "Сравнить изменения (diff)" })
-      map("n", "<leader>hD", function()
+      map("n", "<leader>ghd", gs.diffthis, { desc = "Diff" })
+      map("n", "<leader>ghD", function()
         gs.diffthis("~")
       end, { desc = "Diff против HEAD" })
-      
+
       -- Переключатели
-      map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "Переключить blame строки" })
-      map("n", "<leader>td", gs.toggle_deleted, { desc = "Переключить показ удалённых строк" })
+      map("n", "<leader>ug", gs.toggle_current_line_blame, { desc = "Переключить Git blame" })
+      map("n", "<leader>uG", gs.toggle_deleted, { desc = "Переключить показ удалённых строк Git" })
       
       -- Текстовый объект для hunk
       map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Внутри hunk" })

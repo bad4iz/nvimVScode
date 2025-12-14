@@ -178,15 +178,18 @@ return {
       { "<leader>go", desc = "Открыть в Git (browse)" },
       { "<leader>gB", desc = "Blame для строки" },
 
-      -- Git hunks (<leader>gh)
+      -- Git hunks (<leader>gh) - AstroNvim style
       { "<leader>gh", group = "Git hunks", icon = "" },
       { "<leader>ghs", desc = "Проиндексировать hunk" },
       { "<leader>ghr", desc = "Сбросить hunk" },
       { "<leader>ghS", desc = "Проиндексировать буфер" },
       { "<leader>ghR", desc = "Сбросить буфер" },
+      { "<leader>ghu", desc = "Отменить индексацию hunk" },
       { "<leader>ghp", desc = "Просмотр hunk" },
       { "<leader>ghb", desc = "Blame для строки" },
+      { "<leader>ghB", desc = "Blame для буфера" },
       { "<leader>ghd", desc = "Diff" },
+      { "<leader>ghD", desc = "Diff против HEAD" },
 
       -- ─────────────────────────────────────────────────────────────
       -- LSP / Language Tools (<leader>l)
@@ -214,6 +217,8 @@ return {
       { "<leader>ub", desc = "Переключить фон" },
       { "<leader>ud", desc = "Переключить диагностику" },
       { "<leader>uD", desc = "Скрыть уведомления" },
+      { "<leader>ug", desc = "Переключить Git blame" },
+      { "<leader>uG", desc = "Переключить показ удалённых строк Git" },
       { "<leader>uh", desc = "Переключить inlay hints" },
       { "<leader>ul", desc = "Переключить статус-линию" },
       { "<leader>uL", desc = "Переключить относительные номера" },

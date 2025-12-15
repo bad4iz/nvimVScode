@@ -720,6 +720,13 @@ return {
       desc = "Переключить терминал",
       mode = { "n", "t" },
     },
+    {
+      "<leader>tb",
+      function()
+        Snacks.terminal("btm", { win = { position = "float" } })
+      end,
+      desc = "Bottom (системный монитор)",
+    },
 
     -- ─────────────────────────────────────────────────────────────
     -- БУФЕРЫ (AstroNvim style <leader>b)

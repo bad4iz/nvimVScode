@@ -56,6 +56,9 @@ Neo-tree.nvim - современный файловый менеджер для 
   gu            - Git unstage
   ga            - Git add
   gr            - Git revert
+  gc            - Git commit
+  gp            - Git push
+  gP            - Git commit and push
 
   ДРУГОЕ:
   .             - Toggle скрытые файлы
@@ -83,14 +86,29 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-tree/nvim-web-devicons", -- Иконки из Nerd Font
-    "MunifTanjim/nui.nvim",        -- UI компоненты
+    "MunifTanjim/nui.nvim", -- UI компоненты
   },
 
   -- Горячие клавиши (загружаются вместе с плагином)
   keys = {
     -- Основные команды
     { "<leader>e", "<cmd>Neotree toggle<CR>", desc = "Toggle файловый менеджер" },
-    { "<leader>o", "<cmd>Neotree focus<CR>", desc = "Фокус на файловом менеджере" },
+    {
+      "<leader>o",
+      function()
+        -- Найти окно neo-tree и переключиться на него
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+          local buf = vim.api.nvim_win_get_buf(win)
+          if vim.bo[buf].filetype == "neo-tree" then
+            vim.api.nvim_set_current_win(win)
+            return
+          end
+        end
+        -- Если neo-tree не открыт - открыть
+        vim.cmd("Neotree focus")
+      end,
+      desc = "Фокус на Neo-tree",
+    },
     { "<leader>E", "<cmd>Neotree reveal<CR>", desc = "Найти текущий файл в дереве" },
 
     -- Источники данных (Sources) - группа <leader>e
@@ -142,26 +160,26 @@ return {
 
     -- Доступные источники данных
     sources = {
-      "filesystem",      -- Файловая система (основной)
-      "buffers",         -- Открытые буферы
-      "git_status",      -- Git статус файлов
-      "document_symbols",-- Символы документа (LSP)
+      "filesystem", -- Файловая система (основной)
+      "buffers", -- Открытые буферы
+      "git_status", -- Git статус файлов
+      "document_symbols", -- Символы документа (LSP)
     },
 
     -- Панель переключения между источниками
     source_selector = {
-      winbar = true,              -- Показывать в winbar (верхняя панель окна)
-      statusline = true,         -- Не показывать в statusline
+      winbar = true, -- Показывать в winbar (верхняя панель окна)
+      statusline = true, -- Не показывать в statusline
       show_scrolled_off_parent_node = false,
 
       sources = {
-        { source = "filesystem", display_name = " 󰉋 Files " },      -- Файлы
-        { source = "buffers", display_name = " 󰈚 Buffers " },       -- Буферы
-        { source = "git_status", display_name = " 󰊢 Git " },        -- Git
+        { source = "filesystem", display_name = " 󰉋 Files " }, -- Файлы
+        { source = "buffers", display_name = " 󰈚 Buffers " }, -- Буферы
+        { source = "git_status", display_name = " 󰊢 Git " }, -- Git
       },
 
-      content_layout = "start",   -- Расположение: "start", "end", "center"
-      tabs_layout = "equal",      -- Размер табов: "equal", "focus", "active"
+      content_layout = "start", -- Расположение: "start", "end", "center"
+      tabs_layout = "equal", -- Размер табов: "equal", "focus", "active"
       truncation_character = "…",
       tabs_min_width = nil,
       tabs_max_width = nil,
@@ -206,9 +224,9 @@ return {
 
       -- Иконки файлов и папок (Nerd Font)
       icon = {
-        folder_closed = "",  -- nf-fa-folder
-        folder_open = "",    -- nf-fa-folder_open
-        folder_empty = "",   -- nf-fa-folder_o (пустая папка)
+        folder_closed = "", -- nf-fa-folder
+        folder_open = "", -- nf-fa-folder_open
+        folder_empty = "", -- nf-fa-folder_o (пустая папка)
         folder_empty_open = "", -- nf-fa-folder_open_o
 
         -- Провайдер иконок использует nvim-web-devicons
@@ -246,17 +264,17 @@ return {
       git_status = {
         symbols = {
           -- Типы изменений (Change type)
-          added     = "",  -- U+271A - Новый файл
-          modified  = "",  -- U+2731 - Изменен
-          deleted   = "",  -- U+2716 - Удален
-          renamed   = "",  -- U+279C - Переименован
+          added = "", -- U+271A - Новый файл
+          modified = "", -- U+2731 - Изменен
+          deleted = "", -- U+2716 - Удален
+          renamed = "", -- U+279C - Переименован
 
           -- Статусы (Status type)
-          untracked = "",  -- U+2605 - Не отслеживается
-          ignored   = "",  -- U+25CC - Игнорируется
-          unstaged  = "✗",  -- U+2717 - Не в staging
-          staged    = "",  -- U+2713 - В staging
-          conflict  = "",  -- U+26A0 - Конфликт
+          untracked = "", -- U+2605 - Не отслеживается
+          ignored = "", -- U+25CC - Игнорируется
+          unstaged = "✗", -- U+2717 - Не в staging
+          staged = "", -- U+2713 - В staging
+          conflict = "", -- U+26A0 - Конфликт
 
           -- Альтернативы (раскомментируйте если хотите простые буквы):
           -- added     = "A",
@@ -310,8 +328,8 @@ return {
     -- =====================================================================
 
     window = {
-      position = "left",  -- Позиция: left, right, float, current
-      width = 35,         -- Ширина окна
+      position = "left", -- Позиция: left, right, float, current
+      width = 35, -- Ширина окна
 
       -- Опции маппинга
       mapping_options = {
@@ -324,7 +342,10 @@ return {
         -- =====================================================================
         -- НАВИГАЦИЯ
         -- =====================================================================
-        ["<space>"] = "toggle_node",
+        ["<tab>"] = "toggle_node", -- Изменено с <space> чтобы leader работал
+        ["<leader>o"] = function()
+          vim.cmd("wincmd p") -- Вернуться в предыдущее окно (буфер)
+        end,
         ["<2-LeftMouse>"] = "open",
         ["<cr>"] = "open",
         ["l"] = "open",
@@ -347,13 +368,13 @@ return {
           "add",
           config = {
             show_path = "none", -- "none" - только имя, "relative" - относительный путь, "absolute" - полный путь
-          }
+          },
         },
         ["A"] = {
           "add_directory",
           config = {
             show_path = "none", -- Чистое поле, только название директории
-          }
+          },
         },
         ["d"] = "delete",
         ["r"] = "rename",
@@ -387,7 +408,7 @@ return {
         ["gr"] = "git_revert_file",
         ["gc"] = "git_commit",
         ["gp"] = "git_push",
-        ["gg"] = "git_commit_and_push",
+        ["gP"] = "git_commit_and_push", -- Изменено с gg чтобы не конфликтовать с навигацией
 
         -- =====================================================================
         -- НАВИГАЦИЯ ПО ИСТОЧНИКАМ
@@ -526,13 +547,13 @@ return {
       window = {
         position = "float",
         mappings = {
-          ["A"]  = "git_add_all",
+          ["A"] = "git_add_all",
           ["gu"] = "git_unstage_file",
           ["ga"] = "git_add_file",
           ["gr"] = "git_revert_file",
           ["gc"] = "git_commit",
           ["gp"] = "git_push",
-          ["gg"] = "git_commit_and_push",
+          ["gP"] = "git_commit_and_push", -- Изменено с gg
         },
       },
     },
@@ -546,17 +567,20 @@ return {
       client_filters = "first",
       renderers = {
         root = {
-          {"indent"},
-          {"icon", default = "C" },
-          {"name", zindex = 10},
+          { "indent" },
+          { "icon", default = "C" },
+          { "name", zindex = 10 },
         },
         symbol = {
-          {"indent", with_expanders = true},
-          {"kind_icon", default = "?"},
-          {"container", content = {
-            {"name", zindex = 10},
-            {"kind_name", zindex = 20, align = "right"},
-          }}
+          { "indent", with_expanders = true },
+          { "kind_icon", default = "?" },
+          {
+            "container",
+            content = {
+              { "name", zindex = 10 },
+              { "kind_name", zindex = 20, align = "right" },
+            },
+          },
         },
       },
       window = {

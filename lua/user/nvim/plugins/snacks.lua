@@ -67,7 +67,7 @@ return {
           { icon = " ", key = "O", desc = "Недавние файлы (все)", action = "<leader>fO" },
           { icon = " ", key = "w", desc = "Найти слово", action = "<leader>fw" },
           { icon = " ", key = "'", desc = "Закладки", action = "<leader>f'" },
-          { icon = " ", key = "s", desc = "Последняя сессия", action = "<leader>Sl" },
+          { icon = " ", key = "s", desc = "Сессия проекта", action = "<leader>S." },
           { icon = " ", key = "c", desc = "Конфиг", action = "<leader>fa" },
           { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
           { icon = " ", key = "m", desc = "Mason", action = ":Mason" },

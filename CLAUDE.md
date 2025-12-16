@@ -23,7 +23,14 @@ lua/user/
     ├── options.lua  # Дополнительные опции
     ├── autocmds.lua # Автокоманды
     ├── keymaps.lua  # Горячие клавиши для standalone
-    └── plugins/     # 25 плагинов (LSP, treesitter, UI и т.д.)
+    └── plugins/     # Плагины организованы по категориям
+        ├── completion/  # Автодополнение (blink-cmp, luasnip, supermaven)
+        ├── editor/      # Редактирование (autopairs, comment, surround)
+        ├── git/         # Git интеграция (gitsigns)
+        ├── lang/        # Языки (treesitter, markdown, spell)
+        ├── lsp/         # LSP, форматирование (lsp, mason, conform, trouble)
+        ├── tools/       # Инструменты (neo-tree, snacks, telescope)
+        └── ui/          # Интерфейс (bufferline, lualine, tokyonight)
 ```
 
 **Определение режима** происходит в `init.lua` через проверку `vim.g.vscode`.
@@ -42,28 +49,28 @@ Lock-файл: `lazy-lock.json`
 
 ## Ключевые компоненты
 
-### LSP (lua/user/nvim/plugins/lsp.lua + mason.lua)
+### LSP (lua/user/nvim/plugins/lsp/)
 - **Mason** автоматически устанавливает LSP серверы
 - Серверы: `vtsls` (TypeScript/JavaScript, улучшенная версия), `html`, `css`, `jsonls`, `yamlls`, `lua_ls`, `eslint`, `emmet`, `marksman` (Markdown)
 - Команды: `:Mason`, `:LspInfo`
 
-### Автодополнение (blink-cmp.lua)
+### Автодополнение (lua/user/nvim/plugins/completion/)
 - **blink.cmp** — Rust-based авто дополнение 
 - Интеграция с LuaSnip и friendly-snippets
 
-### Форматирование и линтинг (conform.lua + nvim-lint.lua)
+### Форматирование и линтинг (lua/user/nvim/plugins/lsp/)
 - **conform.nvim** — форматирование (`prettierd`, `stylua`)
 - **nvim-lint** — линтинг (`eslint_d`)
 - Автоформатирование при сохранении включено
 
-### Markdown (markdown.lua)
+### Markdown (lua/user/nvim/plugins/lang/markdown.lua)
 - **render-markdown.nvim** — рендеринг в Neovim (заголовки, списки, таблицы, код)
 - **markdown-preview.nvim** — предварительный просмотр в браузере
 - **marksman LSP** — автодополнение и навигация
 - Диагностика и spell checking отключены по умолчанию
 - Горячие клавиши: `<leader>mr` (toggle рендеринг), `<leader>mp` (preview), `<leader>md` (toggle диагностику)
 
-### Spell Checking (spell.lua)
+### Spell Checking (lua/user/nvim/plugins/lang/spell.lua)
 - Проверка орфографии для **русского** и **английского** языков
 - **Включена по умолчанию** для всех файлов (оба языка одновременно)
 - Словари загружаются через команду `:SpellInstall`
@@ -89,9 +96,18 @@ Lock-файл: `lazy-lock.json`
 
 ## Добавление нового плагина
 
-1. Создать файл в `lua/user/nvim/plugins/` (или `common/plugins/` для обоих режимов)
+1. Создать файл в соответствующей категории `lua/user/nvim/plugins/<category>/`:
+   - `completion/` — автодополнение, сниппеты, AI
+   - `editor/` — редактирование текста (autopairs, comment, surround)
+   - `git/` — Git интеграция
+   - `lang/` — языки, синтаксис, spell
+   - `lsp/` — LSP, форматирование, линтинг
+   - `tools/` — инструменты (file explorer, picker, terminal)
+   - `ui/` — интерфейс (statusline, bufferline, colorscheme)
 2. Вернуть таблицу конфигурации lazy.nvim
 3. Запустить `:Lazy sync`
+
+Для общих плагинов (работающих в обоих режимах): `lua/user/common/plugins/`
 
 ## Принципы разработки
 

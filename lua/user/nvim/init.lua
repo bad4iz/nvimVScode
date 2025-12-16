@@ -44,21 +44,34 @@ for _, file in ipairs(vim.fn.readdir(common_path) or {}) do
   end
 end
 
--- Загружаем nvim плагины
+-- Загружаем nvim плагины (рекурсивно из подпапок)
 local nvim_path = vim.fn.stdpath("config") .. "/lua/user/nvim/plugins"
-for _, file in ipairs(vim.fn.readdir(nvim_path) or {}) do
-  if file:match("%.lua$") and file ~= "init.lua" then
-    local module_name = file:gsub("%.lua$", "")
-    local ok, plugin = pcall(require, "user.nvim.plugins." .. module_name)
-    if ok and plugin then
-      if vim.islist(plugin) then
-        vim.list_extend(nvim_plugins, plugin)
-      else
-        table.insert(nvim_plugins, plugin)
+
+-- Функция для рекурсивной загрузки плагинов
+local function load_plugins_recursive(base_path, module_prefix, plugins_table)
+  for _, entry in ipairs(vim.fn.readdir(base_path) or {}) do
+    local full_path = base_path .. "/" .. entry
+    local stat = vim.uv.fs_stat(full_path)
+
+    if stat and stat.type == "directory" then
+      -- Рекурсивно загружаем из подпапки
+      load_plugins_recursive(full_path, module_prefix .. "." .. entry, plugins_table)
+    elseif entry:match("%.lua$") and entry ~= "init.lua" then
+      -- Загружаем lua файл
+      local module_name = entry:gsub("%.lua$", "")
+      local ok, plugin = pcall(require, module_prefix .. "." .. module_name)
+      if ok and plugin then
+        if vim.islist(plugin) then
+          vim.list_extend(plugins_table, plugin)
+        else
+          table.insert(plugins_table, plugin)
+        end
       end
     end
   end
 end
+
+load_plugins_recursive(nvim_path, "user.nvim.plugins", nvim_plugins)
 
 -- Объединяем все плагины
 local all_plugins = {}

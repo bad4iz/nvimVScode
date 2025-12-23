@@ -12,10 +12,18 @@
 
 Команды:
   :colorscheme tokyonight-night  - сменить тему
-  
+
 GitHub: https://github.com/folke/tokyonight.nvim
+
+Совместимость с Omarchy:
+  В окружении Omarchy тема загружается из omarchy-theme.lua,
+  а этот файл только настраивает плагин без применения colorscheme.
 =====================================================================
 --]]
+
+-- Проверяем, находимся ли мы в окружении Omarchy
+local omarchy_theme_file = vim.fn.expand("~/.config/omarchy/current/theme/neovim.lua")
+local is_omarchy = vim.fn.filereadable(omarchy_theme_file) == 1
 
 return {
   "folke/tokyonight.nvim",
@@ -94,8 +102,11 @@ return {
   
   config = function(_, opts)
     require("tokyonight").setup(opts)
-    
-    -- Применяем цветовую схему
-    vim.cmd.colorscheme("tokyonight-night")
+
+    -- Применяем цветовую схему только если НЕ в Omarchy
+    -- В Omarchy тема применяется через omarchy-theme.lua
+    if not is_omarchy then
+      vim.cmd.colorscheme("tokyonight-night")
+    end
   end,
 }

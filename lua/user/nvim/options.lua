@@ -43,21 +43,21 @@ opt.foldlevelstart = 99
 -- =====================================================================
 -- СТАТУСНАЯ СТРОКА И ТАБЫ
 -- =====================================================================
-opt.laststatus = 3     -- Глобальная статусная строка (для lualine)
-opt.showtabline = 2    -- Всегда показывать строку табов (для bufferline)
+opt.laststatus = 3 -- Глобальная статусная строка (для lualine)
+opt.showtabline = 2 -- Всегда показывать строку табов (для bufferline)
 
 -- =====================================================================
 -- ПРОИЗВОДИТЕЛЬНОСТЬ
 -- =====================================================================
 opt.lazyredraw = false -- Отключено, т.к. может конфликтовать с noice
-opt.synmaxcol = 240    -- Максимум колонок для подсветки синтаксиса
+opt.synmaxcol = 240 -- Максимум колонок для подсветки синтаксиса
 
 -- =====================================================================
 -- СЕССИИ
 -- =====================================================================
 opt.sessionoptions = {
   "buffers",
-  "curdir", 
+  "curdir",
   "tabpages",
   "winsize",
   "help",
@@ -77,11 +77,23 @@ opt.spell = false -- Включается через <leader>us
 -- =====================================================================
 opt.wildmode = "longest:full,full"
 opt.wildignore:append({
-  "*.o", "*.obj", "*.dll", "*.exe",
-  "*.pyc", "*.pyo", "__pycache__",
-  "*.swp", "*.swo", "*~",
-  "node_modules/*", ".git/*",
-  "*.jpg", "*.jpeg", "*.png", "*.gif", "*.svg",
+  "*.o",
+  "*.obj",
+  "*.dll",
+  "*.exe",
+  "*.pyc",
+  "*.pyo",
+  "__pycache__",
+  "*.swp",
+  "*.swo",
+  "*~",
+  "node_modules/*",
+  ".git/*",
+  "*.jpg",
+  "*.jpeg",
+  "*.png",
+  "*.gif",
+  "*.svg",
 })
 
 -- =====================================================================
@@ -89,14 +101,17 @@ opt.wildignore:append({
 -- =====================================================================
 -- Настраиваем здесь, чтобы иконки применялись сразу при старте
 local icons = {
-   error = '', warn = ' ', info = ' ', hint = ' '
+  error = "",
+  warn = " ",
+  info = " ",
+  hint = " ",
 }
 
 vim.diagnostic.config({
   underline = true,
   update_in_insert = false,
   severity_sort = true,
-  
+
   -- Виртуальный текст справа от кода
   virtual_text = {
     spacing = 4,
@@ -111,7 +126,7 @@ vim.diagnostic.config({
       return severity_icons[diagnostic.severity] or "● "
     end,
   },
-  
+
   -- Иконки в колонке знаков (слева от номеров строк)
   signs = {
     text = {
@@ -121,7 +136,7 @@ vim.diagnostic.config({
       [vim.diagnostic.severity.INFO] = icons.info,
     },
   },
-  
+
   -- Плавающее окно диагностики
   float = {
     focusable = true,
@@ -142,10 +157,8 @@ vim.diagnostic.config({
         [vim.diagnostic.severity.HINT] = "Hint",
         [vim.diagnostic.severity.INFO] = "Info",
       }
-      return severity_icons[diagnostic.severity] or "● ", 
-             "DiagnosticSign" .. (severity_names[diagnostic.severity] or "")
+      return severity_icons[diagnostic.severity] or "● ",
+        "DiagnosticSign" .. (severity_names[diagnostic.severity] or "")
     end,
   },
 })
-
-print("✓ Дополнительные настройки nvim загружены")

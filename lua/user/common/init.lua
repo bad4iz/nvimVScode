@@ -27,4 +27,3 @@ require("user.common.options")
 -- Загружаем общие сочетания клавиш
 require("user.common.keymaps")
 
-print("✓ Общий модуль (common) загружен")

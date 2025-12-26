@@ -38,5 +38,3 @@ map("n", "N", "Nzzzv", { desc = "Предыдущее совпадение и ц
 
 -- Сохранение файла (AstroNvim style)
 map("n", "<C-s>", "<cmd>w<CR>", { desc = "Сохранить файл" })
-
-print("✓ Общие сочетания клавиш загружены (AstroNvim style)")

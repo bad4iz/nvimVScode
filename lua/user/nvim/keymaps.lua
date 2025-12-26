@@ -258,8 +258,12 @@ map("n", "<leader>xl", "<cmd>lopen<CR>", { desc = "Открыть location list"
 -- =====================================================================
 
 -- Навигация по диагностике
-map("n", "]d", function() vim.diagnostic.goto_next() end, { desc = "Следующая диагностика" })
-map("n", "[d", function() vim.diagnostic.goto_prev() end, { desc = "Предыдущая диагностика" })
+map("n", "]d", function()
+  vim.diagnostic.goto_next()
+end, { desc = "Следующая диагностика" })
+map("n", "[d", function()
+  vim.diagnostic.goto_prev()
+end, { desc = "Предыдущая диагностика" })
 
 -- Навигация по ошибкам
 map("n", "]e", function()
@@ -278,8 +282,12 @@ map("n", "[w", function()
 end, { desc = "Предыдущее предупреждение" })
 
 -- Показать диагностику строки
-map("n", "gl", function() vim.diagnostic.open_float() end, { desc = "Показать диагностику строки" })
-map("n", "<leader>ld", function() vim.diagnostic.open_float() end, { desc = "Диагностика строки" })
+map("n", "gl", function()
+  vim.diagnostic.open_float()
+end, { desc = "Показать диагностику строки" })
+map("n", "<leader>ld", function()
+  vim.diagnostic.open_float()
+end, { desc = "Диагностика строки" })
 
 -- =====================================================================
 -- РЕДАКТИРОВАНИЕ (AstroNvim style)
@@ -392,5 +400,3 @@ end, { desc = "Не сохранять текущую сессию" })
 map("n", "<leader>S.", function()
   require("persistence").load()
 end, { desc = "Загрузить сессию текущей директории" })
-
-print("✓ Neovim keymaps загружены (AstroNvim style)")

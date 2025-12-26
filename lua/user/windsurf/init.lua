@@ -45,15 +45,15 @@ end
 -- Инициализация Lazy.nvim с минимальным набором плагинов
 require("lazy").setup(common_plugins, {
   defaults = { lazy = true },
-  
+
   ui = {
     border = "rounded",
   },
-  
+
   change_detection = {
     notify = false,
   },
-  
+
   performance = {
     cache = {
       enabled = true,
@@ -75,5 +75,3 @@ require("lazy").setup(common_plugins, {
 
 -- Загружаем VSCode-специфичные keymaps
 require("user.windsurf.keymaps")
-
-print("✓ Конфигурация VSCode/Windsurf загружена!")

@@ -1,4 +1,3 @@
-
 --[[
 =====================================================================
                     STANDALONE NEOVIM КОНФИГУРАЦИЯ
@@ -84,11 +83,11 @@ require("lazy").setup(all_plugins, {
     lazy = true, -- Ленивая загрузка по умолчанию
     version = false, -- Всегда использовать последнюю версию
   },
-  
+
   install = {
     colorscheme = { "tokyonight", "habamax" },
   },
-  
+
   ui = {
     border = "rounded",
     icons = {
@@ -116,18 +115,18 @@ require("lazy").setup(all_plugins, {
       },
     },
   },
-  
+
   checker = {
     enabled = true, -- Проверять обновления
     notify = false, -- Не уведомлять
     frequency = 86400, -- Раз в день
   },
-  
+
   change_detection = {
     enabled = true,
     notify = false,
   },
-  
+
   performance = {
     cache = {
       enabled = true,
@@ -154,11 +153,21 @@ require("lazy").setup(all_plugins, {
 local keymap = vim.keymap.set
 
 -- Lazy
-keymap("n", "<leader>pi", function() require("lazy").install() end, { desc = "Установить плагины" })
-keymap("n", "<leader>ps", function() require("lazy").home() end, { desc = "Статус плагинов" })
-keymap("n", "<leader>pS", function() require("lazy").sync() end, { desc = "Синхронизировать плагины" })
-keymap("n", "<leader>pu", function() require("lazy").check() end, { desc = "Проверить обновления плагинов" })
-keymap("n", "<leader>pU", function() require("lazy").update() end, { desc = "Обновить плагины" })
+keymap("n", "<leader>pi", function()
+  require("lazy").install()
+end, { desc = "Установить плагины" })
+keymap("n", "<leader>ps", function()
+  require("lazy").home()
+end, { desc = "Статус плагинов" })
+keymap("n", "<leader>pS", function()
+  require("lazy").sync()
+end, { desc = "Синхронизировать плагины" })
+keymap("n", "<leader>pu", function()
+  require("lazy").check()
+end, { desc = "Проверить обновления плагинов" })
+keymap("n", "<leader>pU", function()
+  require("lazy").update()
+end, { desc = "Обновить плагины" })
 
 -- Mason
 keymap("n", "<leader>pm", "<cmd>Mason<CR>", { desc = "Открыть Mason" })
@@ -173,4 +182,3 @@ end, { desc = "Обновить всё (Lazy + Mason)" })
 -- Информация о LSP
 keymap("n", "<leader>li", "<cmd>LspInfo<CR>", { desc = "Информация LSP" })
 
-print("✓ Конфигурация standalone Neovim загружена (AstroNvim style)!")

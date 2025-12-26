@@ -47,7 +47,28 @@ vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
     vim.defer_fn(function()
       -- Отключаем все z-команды, которые переопределяет расширение
-      for _, key in ipairs({"zz", "zb", "zt", "z-", "z.", "z<CR>", "z=", "zo", "zc", "za", "zr", "zm", "zR", "zM", "zn", "zN", "zh", "zl", "zk", "zj"}) do
+      for _, key in ipairs({
+        "zz",
+        "zb",
+        "zt",
+        "z-",
+        "z.",
+        "z<CR>",
+        "z=",
+        "zo",
+        "zc",
+        "za",
+        "zr",
+        "zm",
+        "zR",
+        "zM",
+        "zn",
+        "zN",
+        "zh",
+        "zl",
+        "zk",
+        "zj",
+      }) do
         vim.keymap.set("n", key, "<Nop>", { noremap = true, silent = true })
       end
     end, 150)
@@ -61,8 +82,7 @@ function TestConfig()
   vim.notify("✓ Конфигурация Neovim для VSCode работает!", vim.log.levels.INFO)
 end
 
-vim.api.nvim_create_user_command("TestConfig", TestConfig, { 
-  desc = "Проверить конфигурацию" 
+vim.api.nvim_create_user_command("TestConfig", TestConfig, {
+  desc = "Проверить конфигурацию",
 })
 
-print("✓ Настройки VSCode загружены")

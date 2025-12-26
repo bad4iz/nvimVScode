@@ -104,6 +104,128 @@ map("n", "[b", "<cmd>bprevious<CR>", { desc = "Предыдущий буфер" 
 map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Предыдущий буфер" })
 map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Следующий буфер" })
 
+-- Перемещение буферов влево/вправо (AstroNvim style)
+map("n", ">b", function()
+  local ok, bufferline = pcall(require, "bufferline")
+  if ok then
+    bufferline.move(1)
+  else
+    vim.notify("bufferline.nvim не установлен", vim.log.levels.WARN)
+  end
+end, { desc = "Переместить буфер вправо" })
+
+map("n", "<b", function()
+  local ok, bufferline = pcall(require, "bufferline")
+  if ok then
+    bufferline.move(-1)
+  else
+    vim.notify("bufferline.nvim не установлен", vim.log.levels.WARN)
+  end
+end, { desc = "Переместить буфер влево" })
+
+-- =====================================================================
+-- УПРАВЛЕНИЕ БУФЕРАМИ (AstroNvim style)
+-- =====================================================================
+
+-- Закрыть все буферы кроме текущего
+map("n", "<leader>bc", function()
+  local current = vim.api.nvim_get_current_buf()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if buf ~= current and vim.bo[buf].buflisted then
+      vim.api.nvim_buf_delete(buf, { force = false })
+    end
+  end
+end, { desc = "Закрыть все кроме текущего" })
+
+-- Закрыть все буферы
+map("n", "<leader>bC", function()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.bo[buf].buflisted then
+      vim.api.nvim_buf_delete(buf, { force = false })
+    end
+  end
+end, { desc = "Закрыть все буферы" })
+
+-- Предыдущий буфер (дубликат для совместимости)
+map("n", "<leader>bp", "<cmd>bprevious<CR>", { desc = "Предыдущий буфер" })
+
+-- Закрыть буферы слева/справа от текущего
+map("n", "<leader>bl", function()
+  local current = vim.api.nvim_get_current_buf()
+  local bufs = vim.api.nvim_list_bufs()
+  for i, buf in ipairs(bufs) do
+    if buf == current then
+      break
+    end
+    if vim.bo[buf].buflisted then
+      vim.api.nvim_buf_delete(buf, { force = false })
+    end
+  end
+end, { desc = "Закрыть буферы слева" })
+
+map("n", "<leader>br", function()
+  local current = vim.api.nvim_get_current_buf()
+  local bufs = vim.api.nvim_list_bufs()
+  local found = false
+  for _, buf in ipairs(bufs) do
+    if found and vim.bo[buf].buflisted then
+      vim.api.nvim_buf_delete(buf, { force = false })
+    end
+    if buf == current then
+      found = true
+    end
+  end
+end, { desc = "Закрыть буферы справа" })
+
+-- =====================================================================
+-- СОРТИРОВКА БУФЕРОВ (AstroNvim style)
+-- =====================================================================
+
+map("n", "<leader>bse", function()
+  local ok, bufferline = pcall(require, "bufferline")
+  if ok then
+    bufferline.sort_buffers_by("extension")
+  else
+    vim.notify("bufferline.nvim не установлен", vim.log.levels.WARN)
+  end
+end, { desc = "Сортировать по расширению" })
+
+map("n", "<leader>bsi", function()
+  local ok, bufferline = pcall(require, "bufferline")
+  if ok then
+    bufferline.sort_buffers_by("id")
+  else
+    vim.notify("bufferline.nvim не установлен", vim.log.levels.WARN)
+  end
+end, { desc = "Сортировать по номеру" })
+
+map("n", "<leader>bsm", function()
+  local ok, bufferline = pcall(require, "bufferline")
+  if ok then
+    bufferline.sort_buffers_by("modified")
+  else
+    vim.notify("bufferline.nvim не установлен", vim.log.levels.WARN)
+  end
+end, { desc = "Сортировать по изменению" })
+
+map("n", "<leader>bsp", function()
+  local ok, bufferline = pcall(require, "bufferline")
+  if ok then
+    bufferline.sort_buffers_by("directory")
+  else
+    vim.notify("bufferline.nvim не установлен", vim.log.levels.WARN)
+  end
+end, { desc = "Сортировать по пути" })
+
+map("n", "<leader>bsr", function()
+  local ok, bufferline = pcall(require, "bufferline")
+  if ok then
+    bufferline.sort_buffers_by("relative_directory")
+  else
+    vim.notify("bufferline.nvim не установлен", vim.log.levels.WARN)
+  end
+end, { desc = "Сортировать по относительному пути" })
+
 -- =====================================================================
 -- НАВИГАЦИЯ ПО ТАБАМ (AstroNvim style)
 -- =====================================================================
@@ -233,5 +355,42 @@ map("n", "<leader>R", function()
     vim.cmd("bd " .. old_name)
   end
 end, { desc = "Переименовать файл" })
+
+-- =====================================================================
+-- PACKAGE MANAGEMENT (AstroNvim style)
+-- =====================================================================
+
+-- Lazy.nvim маппинги
+map("n", "<leader>pa", "<cmd>Lazy update<CR>", { desc = "Обновить все плагины" })
+map("n", "<leader>pi", "<cmd>Lazy install<CR>", { desc = "Установить плагины" })
+map("n", "<leader>ps", "<cmd>Lazy<CR>", { desc = "Статус плагинов" })
+map("n", "<leader>pS", "<cmd>Lazy sync<CR>", { desc = "Синхронизировать плагины" })
+map("n", "<leader>pu", "<cmd>Lazy check<CR>", { desc = "Проверить обновления" })
+map("n", "<leader>pU", "<cmd>Lazy update<CR>", { desc = "Обновить плагины" })
+
+-- Mason маппинги
+map("n", "<leader>pm", "<cmd>Mason<CR>", { desc = "Mason установщик" })
+map("n", "<leader>pM", "<cmd>MasonUpdateAll<CR>", { desc = "Обновить Mason пакеты" })
+
+-- =====================================================================
+-- SESSION MANAGEMENT (AstroNvim style)
+-- =====================================================================
+
+-- persistence.nvim маппинги
+map("n", "<leader>Ss", function()
+  require("persistence").save()
+end, { desc = "Сохранить сессию" })
+
+map("n", "<leader>Sl", function()
+  require("persistence").load({ last = true })
+end, { desc = "Загрузить последнюю сессию" })
+
+map("n", "<leader>Sd", function()
+  require("persistence").stop()
+end, { desc = "Не сохранять текущую сессию" })
+
+map("n", "<leader>S.", function()
+  require("persistence").load()
+end, { desc = "Загрузить сессию текущей директории" })
 
 print("✓ Neovim keymaps загружены (AstroNvim style)")

@@ -10,18 +10,17 @@ Git интеграция: знаки изменений, blame, hunk опера�
   _  - удалённые строки (красный)
 
 Горячие клавиши (AstroNvim style):
-  ]h           - следующий hunk (изменение)
-  [h           - предыдущий hunk
-  <leader>ghs  - проиндексировать hunk
-  <leader>ghr  - сбросить hunk
-  <leader>ghS  - проиндексировать весь буфер
-  <leader>ghR  - сбросить весь буфер
-  <leader>ghu  - отменить индексацию hunk
-  <leader>ghp  - просмотр hunk
-  <leader>ghb  - blame строки
-  <leader>ghB  - blame буфера
-  <leader>ghd  - diff текущего файла
-  <leader>ghD  - diff против HEAD
+  <leader>gj   - следующий hunk (изменение)
+  <leader>gk   - предыдущий hunk
+  <leader>gs   - проиндексировать hunk (Stage)
+  <leader>gr   - сбросить hunk (Reset)
+  <leader>gS   - проиндексировать весь буфер (Stage Buffer)
+  <leader>gR   - сбросить весь буфер (Reset Buffer)
+  <leader>gu   - отменить индексацию hunk (Undo stage)
+  <leader>gp   - просмотр hunk (Preview)
+  <leader>gl   - blame строки (bLame)
+  <leader>gd   - diff текущего файла (Diff)
+  <leader>gD   - diff против кэша (Diff cached)
   <leader>ug   - переключить git blame
   <leader>uG   - переключить показ удалённых строк
 
@@ -106,54 +105,50 @@ return {
         vim.keymap.set(mode, l, r, opts)
       end
       
-      -- Навигация по hunk'ам
-      map("n", "]h", function()
+      -- Навигация по hunk'ам (AstroNvim style: <leader>gj/gk)
+      map("n", "<leader>gj", function()
         if vim.wo.diff then
           vim.cmd.normal({ "]c", bang = true })
         else
           gs.nav_hunk("next")
         end
-      end, { desc = "Следующий hunk" })
-      
-      map("n", "[h", function()
+      end, { desc = "Next Hunk" })
+
+      map("n", "<leader>gk", function()
         if vim.wo.diff then
           vim.cmd.normal({ "[c", bang = true })
         else
           gs.nav_hunk("prev")
         end
-      end, { desc = "Предыдущий hunk" })
-      
-      -- Действия с hunk'ами (AstroNvim style: <leader>gh)
-      map("n", "<leader>ghs", gs.stage_hunk, { desc = "Проиндексировать hunk" })
-      map("n", "<leader>ghr", gs.reset_hunk, { desc = "Сбросить hunk" })
+      end, { desc = "Previous Hunk" })
 
-      map("v", "<leader>ghs", function()
+      -- Действия с hunk'ами (AstroNvim style: <leader>g*)
+      map("n", "<leader>gs", gs.stage_hunk, { desc = "Stage Hunk" })
+      map("n", "<leader>gr", gs.reset_hunk, { desc = "Reset Hunk" })
+
+      map("v", "<leader>gs", function()
         gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-      end, { desc = "Проиндексировать выделенный hunk" })
+      end, { desc = "Stage Hunk (visual)" })
 
-      map("v", "<leader>ghr", function()
+      map("v", "<leader>gr", function()
         gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-      end, { desc = "Сбросить выделенный hunk" })
+      end, { desc = "Reset Hunk (visual)" })
 
-      map("n", "<leader>ghS", gs.stage_buffer, { desc = "Проиндексировать буфер" })
-      map("n", "<leader>ghR", gs.reset_buffer, { desc = "Сбросить буфер" })
-      map("n", "<leader>ghu", gs.undo_stage_hunk, { desc = "Отменить индексацию hunk" })
-      map("n", "<leader>ghp", gs.preview_hunk, { desc = "Просмотр hunk" })
+      map("n", "<leader>gS", gs.stage_buffer, { desc = "Stage Buffer" })
+      map("n", "<leader>gR", gs.reset_buffer, { desc = "Reset Buffer" })
+      map("n", "<leader>gu", gs.undo_stage_hunk, { desc = "Undo Stage Hunk" })
+      map("n", "<leader>gp", gs.preview_hunk, { desc = "Preview Hunk" })
 
-      -- Blame
-      map("n", "<leader>ghb", function()
+      -- Blame (AstroNvim style: <leader>gl)
+      map("n", "<leader>gl", function()
         gs.blame_line({ full = true })
-      end, { desc = "Blame для строки" })
+      end, { desc = "Git Blame Line" })
 
-      map("n", "<leader>ghB", function()
-        gs.blame()
-      end, { desc = "Blame для буфера" })
-
-      -- Diff
-      map("n", "<leader>ghd", gs.diffthis, { desc = "Diff" })
-      map("n", "<leader>ghD", function()
+      -- Diff (AstroNvim style: <leader>gd)
+      map("n", "<leader>gd", gs.diffthis, { desc = "Git Diff" })
+      map("n", "<leader>gD", function()
         gs.diffthis("~")
-      end, { desc = "Diff против HEAD" })
+      end, { desc = "Git Diff (cached)" })
 
       -- Переключатели
       map("n", "<leader>ug", gs.toggle_current_line_blame, { desc = "Переключить Git blame" })

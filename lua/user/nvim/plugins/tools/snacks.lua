@@ -576,7 +576,7 @@ return {
     {
       "<leader>gB",
       function()
-        Snacks.git_blame_line()
+        Snacks.git.blame_line()
       end,
       desc = "Git-blame для строки",
     },

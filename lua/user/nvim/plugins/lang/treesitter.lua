@@ -26,27 +26,33 @@ GitHub: https://github.com/nvim-treesitter/nvim-treesitter
 
 return {
   "nvim-treesitter/nvim-treesitter",
-  version = false, -- Последняя версия
+  branch = "master", -- Используем стабильную ветку master (старый API)
   build = ":TSUpdate", -- Обновить парсеры после установки
-  
+
   -- Загружать при событиях открытия файлов
   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-  
+
   -- Ленивая загрузка
   lazy = vim.fn.argc(-1) == 0,
-  
+
   -- Дополнительные модули
   dependencies = {
     -- Текстовые объекты на основе treesitter
-    "nvim-treesitter/nvim-treesitter-textobjects",
+    {
+      "nvim-treesitter/nvim-treesitter-textobjects",
+      -- ВАЖНО: удаляем проблемный файл автозагрузки после установки
+      build = function()
+        local plugin_file = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter-textobjects/plugin/nvim-treesitter-textobjects.vim"
+        if vim.fn.filereadable(plugin_file) == 1 then
+          vim.fn.delete(plugin_file)
+        end
+      end,
+      config = function()
+        -- Пустая конфигурация - настройка через основной treesitter
+      end,
+    },
   },
-  
-  init = function(plugin)
-    -- Добавляем запрос до загрузки плагина
-    require("lazy.core.loader").add_to_rtp(plugin)
-    require("nvim-treesitter.query_predicates")
-  end,
-  
+
   cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
   
   ---@type TSConfig

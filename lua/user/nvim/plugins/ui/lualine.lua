@@ -8,10 +8,9 @@
   - Режим (Normal, Insert, Visual и т.д.)
   - Ветка Git и изменения
   - Диагностика (ошибки, предупреждения)
-  - Название файла и тип
   - Кодировка и формат
   - Позиция курсора
-  - Статус LSP
+  - WakaTime (время кодирования)
   - Статус AI (Supermaven)
 
 GitHub: https://github.com/nvim-lualine/lualine.nvim
@@ -47,19 +46,46 @@ return {
       return "󱙻"
     end
 
-    -- Компонент для отображения LSP серверов
-    local function lsp_clients()
-      local clients = vim.lsp.get_clients({ bufnr = 0 })
-      if #clients == 0 then
-        return ""
+    -- Компонент для отображения WakaTime
+    local wakatime_cache = { text = "", last_update = 0, initialized = false }
+
+    local function update_wakatime()
+      vim.fn.jobstart({
+        vim.fn.expand("~/.wakatime/wakatime-cli"),
+        "--today",
+      }, {
+        stdout_buffered = true,
+        on_stdout = function(_, data)
+          if data and data[1] and data[1] ~= "" then
+            local time_str = data[1]:match("^%s*(.-)%s*$") -- trim
+            if time_str and time_str ~= "" and not time_str:match("^0%s") then
+              wakatime_cache.text = " " .. time_str
+            else
+              wakatime_cache.text = ""
+            end
+          end
+        end,
+        on_stderr = function()
+          wakatime_cache.text = ""
+        end,
+      })
+    end
+
+    local function wakatime_status()
+      -- Инициализация при первом вызове
+      if not wakatime_cache.initialized then
+        wakatime_cache.initialized = true
+        update_wakatime()
       end
 
-      local names = {}
-      for _, client in ipairs(clients) do
-        table.insert(names, client.name)
+      -- Обновляем каждые 120 секунд
+      local now = os.time()
+      if now - wakatime_cache.last_update > 120 then
+        wakatime_cache.last_update = now
+        update_wakatime()
       end
 
-      return "󱒊" .. table.concat(names, ", ")
+      return wakatime_cache.text
     end
 
     return {
@@ -127,18 +153,7 @@ return {
               Error = "", -- Ошибка
               Warn = "", -- Предупреждение
               Hint = "󰌵", -- Подсказка
-              Info = "", -- Информация
-            },
-          },
-          { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-          {
-            "filename",
-            path = 0, -- Только имя файла без пути
-            symbols = {
-              modified = "󱧃",
-              readonly = "",
-              unnamed = "[Без имени]",
-              newfile = "[Новый]",
+              Info = "", -- Информация
             },
           },
         },
@@ -147,26 +162,16 @@ return {
         -- ПРАВАЯ ЧАСТЬ
         -- ═══════════════════════════════════════════════════════════
         lualine_x = {
+          -- WakaTime
+          {
+            wakatime_status,
+            color = { fg = colors.blue },
+          },
           -- Статус Supermaven
           {
             supermaven_status,
             color = { fg = colors.green },
           },
-          -- LSP серверы
-          {
-            lsp_clients,
-            color = { fg = colors.cyan },
-          },
-          -- Отступы (пробелы/табы)
-          -- {
-          --   function()
-          --     local space = vim.bo.expandtab and "Пробелы" or "Табы"
-          --     return space .. ":" .. vim.bo.shiftwidth
-          --   end,
-          --   cond = function()
-          --     return vim.bo.filetype ~= ""
-          --   end,
-          -- },
         },
 
         lualine_y = {
@@ -187,7 +192,7 @@ return {
       inactive_sections = {
         lualine_a = {},
         lualine_b = {},
-        lualine_c = { "filename" },
+        lualine_c = {},
         lualine_x = { "location" },
         lualine_y = {},
         lualine_z = {},

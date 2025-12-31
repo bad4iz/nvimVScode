@@ -46,46 +46,14 @@ return {
       return "󱙻"
     end
 
-    -- Компонент для отображения WakaTime
-    local wakatime_cache = { text = "", last_update = 0, initialized = false }
-
-    local function update_wakatime()
-      vim.fn.jobstart({
-        vim.fn.expand("~/.wakatime/wakatime-cli"),
-        "--today",
-      }, {
-        stdout_buffered = true,
-        on_stdout = function(_, data)
-          if data and data[1] and data[1] ~= "" then
-            local time_str = data[1]:match("^%s*(.-)%s*$") -- trim
-            if time_str and time_str ~= "" and not time_str:match("^0%s") then
-              wakatime_cache.text = " " .. time_str
-            else
-              wakatime_cache.text = ""
-            end
-          end
-        end,
-        on_stderr = function()
-          wakatime_cache.text = ""
-        end,
-      })
-    end
-
+    -- Компонент для отображения WakaTime через wakastat.nvim
     local function wakatime_status()
-      -- Инициализация при первом вызове
-      if not wakatime_cache.initialized then
-        wakatime_cache.initialized = true
-        update_wakatime()
+      local ok, wakastat = pcall(require, "wakastat")
+      if ok then
+        local status = wakastat.status()
+        return status and status ~= "" and " " .. status or " 0:0"
       end
-
-      -- Обновляем каждые 120 секунд
-      local now = os.time()
-      if now - wakatime_cache.last_update > 120 then
-        wakatime_cache.last_update = now
-        update_wakatime()
-      end
-
-      return wakatime_cache.text
+      return " 0:0"
     end
 
     return {

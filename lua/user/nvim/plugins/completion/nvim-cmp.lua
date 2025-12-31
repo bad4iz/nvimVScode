@@ -388,9 +388,7 @@ return {
       -- ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ
       -- ═══════════════════════════════════════════════════════════════
       experimental = {
-        ghost_text = {
-          hl_group = "CmpGhostText",
-        },
+        ghost_text = false, -- Отключено, используем Supermaven inline
       },
 
       -- Производительность

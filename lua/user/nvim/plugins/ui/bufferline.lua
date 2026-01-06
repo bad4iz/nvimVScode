@@ -1,3 +1,5 @@
+---@diagnostic disable-next-line: undefined-global
+local vim = vim
 --[[
 =====================================================================
                         BUFFERLINE
@@ -83,6 +85,20 @@ return {
 
         --[[
         ═══════════════════════════════════════════════════════════════
+                           ИКОНКИ (Nerd Font)
+        ═══════════════════════════════════════════════════════════════
+        Требуется Nerd Font для корректного отображения!
+        Проверить шрифт: :echo &guifont или в терминале
+        --]]
+
+        buffer_close_icon = "󰅖", -- Кнопка × на каждом табе
+        modified_icon = "", -- Точка для изменённых файлов (несохранённых)
+        close_icon = "X", -- Кнопка закрытия справа всего bufferline
+        left_trunc_marker = "<<", -- Стрелка "есть скрытые табы слева"
+        right_trunc_marker = ">>", -- Стрелка "есть скрытые табы справа"
+
+        --[[
+        ═══════════════════════════════════════════════════════════════
                              НОМЕРА БУФЕРОВ
         ═══════════════════════════════════════════════════════════════
         --]]
@@ -133,27 +149,13 @@ return {
         --]]
 
         indicator = {
-          icon = "▎", -- Символ индикатора (вертикальная полоска слева)
+          icon = "", -- Символ индикатора (вертикальная полоска слева)
           -- Стили индикатора:
           -- "icon"      = показать иконку (▎)
           -- "underline" = подчеркнуть активный таб
           -- "none"      = без индикатора
-          style = "icon",
+          style = "none",
         },
-
-        --[[
-        ═══════════════════════════════════════════════════════════════
-                           ИКОНКИ (Nerd Font)
-        ═══════════════════════════════════════════════════════════════
-        Требуется Nerd Font для корректного отображения!
-        Проверить шрифт: :echo &guifont или в терминале
-        --]]
-
-        buffer_close_icon = "󰅖", -- Кнопка × на каждом табе
-        modified_icon = "●", -- Точка для изменённых файлов (несохранённых)
-        close_icon = "X", -- Кнопка закрытия справа всего bufferline
-        left_trunc_marker = "<<", -- Стрелка "есть скрытые табы слева"
-        right_trunc_marker = ">>", -- Стрелка "есть скрытые табы справа"
 
         --[[
         ═══════════════════════════════════════════════════════════════
@@ -164,7 +166,7 @@ return {
         max_name_length = 30, -- Максимальная длина имени файла
         max_prefix_length = 30, -- Максимальная длина префикса (путь для дубликатов)
         truncate_names = true, -- Обрезать длинные имена с ...
-        tab_size = 21, -- Минимальная ширина таба в символах
+        tab_size = 11, -- Минимальная ширина таба в символах
 
         --[[
         ═══════════════════════════════════════════════════════════════
@@ -182,18 +184,18 @@ return {
         -- Обновлять диагностику в insert mode?
         -- false = обновлять только при выходе из insert (меньше мерцания)
         diagnostics_update_in_insert = false,
-
         -- Функция для форматирования индикатора диагностики
         -- count = количество проблем
         -- level = "error" | "warning" | "info" | "hint"
         diagnostics_indicator = function(count, level)
           local icons = {
-            error = "", -- Красный круг с крестом
-            warn = "", -- Жёлтый треугольник
-            info = "", -- Синяя буква i
-            hint = "", -- Лампочка
+
+            error = "", -- Ошибка
+            warning = "", -- Предупреждение
+            hint = "󰌵", -- Подсказка
+            info = "i", -- Информация
           }
-          return " " .. (icons[level] or "") .. count
+          return "| " .. (icons[level] or "") .. " " .. count
         end,
 
         --[[
@@ -389,35 +391,10 @@ return {
     ═══════════════════════════════════════════════════════════════════
                     ДИНАМИЧЕСКАЯ СМЕНА ЦВЕТА ПО РЕЖИМУ
     ═══════════════════════════════════════════════════════════════════
-    Цвет активного таба меняется в зависимости от режима Vim
-    (идентично lualine tokyonight)
+    Цвет фона активного таба меняется в зависимости от режима Vim
     --]]
 
-    -- -- Яркие цвета из tokyonight (как в lualine)
-    -- local mode_colors = {
-    --   n = "#7aa2f7", -- Normal: синий
-    --   i = "#9ece6a", -- Insert: зелёный
-    --   v = "#bb9af7", -- Visual: фиолетовый
-    --   V = "#bb9af7", -- Visual Line
-    --   [""] = "#bb9af7", -- Visual Block
-    --   c = "#e0af68", -- Command: жёлтый
-    --   R = "#f7768e", -- Replace: красный
-    --   t = "#73daca", -- Terminal: бирюзовый
-    -- }
-
-    -- -- Приглушённые цвета для bufferline (темнее, но сохраняют характер)
-    -- local mode_colors = {
-    --   n = "#3d5a9e", -- Normal: тёмно-синий
-    --   i = "#5a7a3a", -- Insert: тёмно-зелёный
-    --   v = "#6b4a8e", -- Visual: тёмно-фиолетовый
-    --   V = "#6b4a8e", -- Visual Line
-    --   [""] = "#6b4a8e", -- Visual Block
-    --   c = "#8a6a30", -- Command: тёмно-жёлтый/горчичный
-    --   R = "#9a3a4a", -- Replace: тёмно-красный
-    --   t = "#3a7a6a", -- Terminal: тёмно-бирюзовый
-    -- }
-
-    -- Ещё более тёмные версии
+    -- Цвета режимов (только для фона)
     local mode_colors = {
       n = "#2d4a7e", -- Normal
       i = "#4a6a2a", -- Insert
@@ -429,41 +406,49 @@ return {
       t = "#2a6a5a", -- Terminal
     }
 
-    local fg_dark = "#15161e" -- Тёмный текст на ярком фоне (как в lualine)
-    local bg_inactive = "#24283b" -- Фон неактивных табов
+    -- Цвета из highlights (для сохранения fg)
+    local c = {
+      fg = "#c0caf5",
+      fg_dark = "#a9b1d6",
+      cyan = "#7dcfff",
+      yellow = "#e0af68",
+      red = "#f7768e",
+      teal = "#1abc9c",
+      blue = "#7aa2f7",
+      bg_dark = "#1a1b26",
+    }
 
-    -- Функция обновления highlight групп
     local function update_bufferline_colors()
       local mode = vim.fn.mode()
       local bg = mode_colors[mode] or mode_colors.n
 
-      -- Все highlight группы для активного таба
-      vim.api.nvim_set_hl(0, "BufferLineBufferSelected", { fg = fg_dark, bg = bg, bold = true })
-      vim.api.nvim_set_hl(0, "BufferLineNumbersSelected", { fg = fg_dark, bg = bg, bold = true })
-      vim.api.nvim_set_hl(0, "BufferLineCloseButtonSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineModifiedSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineDuplicateSelected", { fg = fg_dark, bg = bg, italic = true })
-      vim.api.nvim_set_hl(0, "BufferLineIndicatorSelected", { fg = bg, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineTabSelected", { fg = fg_dark, bg = bg, bold = true })
+      -- Только меняем bg, fg остаётся из highlights
+      vim.api.nvim_set_hl(0, "BufferLineBufferSelected", { fg = c.fg, bg = bg, bold = true })
+      vim.api.nvim_set_hl(0, "BufferLineNumbersSelected", { fg = c.cyan, bg = bg, bold = true })
+      vim.api.nvim_set_hl(0, "BufferLineCloseButtonSelected", { fg = c.fg, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineModifiedSelected", { fg = c.yellow, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineDuplicateSelected", { fg = c.fg_dark, bg = bg, italic = true })
+      vim.api.nvim_set_hl(0, "BufferLineIndicatorSelected", { fg = c.blue, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineTabSelected", { fg = c.fg, bg = bg, bold = true })
 
-      -- Разделители (slant style)
-      vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineTabSeparatorSelected", { fg = fg_dark, bg = bg })
+      -- Разделители
+      vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", { fg = c.bg_dark, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineTabSeparatorSelected", { fg = c.bg_dark, bg = bg })
 
-      -- Диагностика на активном табе
-      vim.api.nvim_set_hl(0, "BufferLineErrorSelected", { fg = fg_dark, bg = bg, bold = true })
-      vim.api.nvim_set_hl(0, "BufferLineErrorDiagnosticSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineWarningSelected", { fg = fg_dark, bg = bg, bold = true })
-      vim.api.nvim_set_hl(0, "BufferLineWarningDiagnosticSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineInfoSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineInfoDiagnosticSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineHintSelected", { fg = fg_dark, bg = bg })
-      vim.api.nvim_set_hl(0, "BufferLineHintDiagnosticSelected", { fg = fg_dark, bg = bg })
+      -- Диагностика — сохраняем цвета ошибок/предупреждений
+      vim.api.nvim_set_hl(0, "BufferLineErrorSelected", { fg = c.red, bg = bg, bold = true })
+      vim.api.nvim_set_hl(0, "BufferLineErrorDiagnosticSelected", { fg = c.red, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineWarningSelected", { fg = c.yellow, bg = bg, bold = true })
+      vim.api.nvim_set_hl(0, "BufferLineWarningDiagnosticSelected", { fg = c.yellow, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineInfoSelected", { fg = c.cyan, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineInfoDiagnosticSelected", { fg = c.cyan, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineHintSelected", { fg = c.teal, bg = bg })
+      vim.api.nvim_set_hl(0, "BufferLineHintDiagnosticSelected", { fg = c.teal, bg = bg })
 
       -- Pick буквы
-      vim.api.nvim_set_hl(0, "BufferLinePickSelected", { fg = fg_dark, bg = bg, bold = true })
+      vim.api.nvim_set_hl(0, "BufferLinePickSelected", { fg = c.red, bg = bg, bold = true })
 
-      -- Обновить ВСЕ иконки DevIcon*Selected (они кэшируются)
+      -- Иконки — сохраняем их оригинальный fg цвет
       for name, _ in pairs(vim.api.nvim_get_hl(0, {})) do
         if name:match("^BufferLineDevIcon.*Selected$") then
           local current = vim.api.nvim_get_hl(0, { name = name })
@@ -471,7 +456,6 @@ return {
         end
       end
 
-      -- Перерисовать tabline
       vim.cmd.redrawtabline()
     end
 
@@ -497,7 +481,7 @@ return {
     --]]
 
     vim.api.nvim_create_autocmd("BufDelete", {
-      callback = function(event)
+      callback = function(as)
         vim.schedule(function()
           pcall(vim.cmd, "BufferLineCycleNext")
         end)

@@ -144,13 +144,13 @@ return {
 
         lualine_y = {
           { "encoding", show_bomb = true },
-          { "fileformat", icons_enabled = true },
-          { "filetype" },
+          -- { "fileformat", icons_enabled = true },
+          -- { "filetype" },
         },
 
         lualine_z = {
-          { "progress" },
           { "location" },
+          { "progress" },
         },
       },
 

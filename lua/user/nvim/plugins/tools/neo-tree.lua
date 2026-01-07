@@ -89,6 +89,37 @@ return {
     "MunifTanjim/nui.nvim", -- UI компоненты
   },
 
+  config = function(_, opts)
+    -- Настройка highlight групп для директорий
+    local colors = {
+      fg_light = "#c0caf5", -- Светлый белый (Tokyo Night)
+      fg_dir = "#a9b1d6", -- Белый с голубым оттенком для директорий
+      yellow = "#e0af68", -- Предупреждения и модифицированные
+      red = "#f7768e", -- Ошибки
+      green = "#9ece6a", -- Добавленные
+      cyan = "#7dcfff", -- Информация
+    }
+
+    -- Цвет директорий - белый с нужным оттенком
+    vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = colors.fg_dir })
+    vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { fg = colors.cyan })
+
+    -- Подсветка родительских директорий с диагностикой/git статусом
+    vim.api.nvim_set_hl(0, "NeoTreeGitModified", { fg = colors.yellow })
+    vim.api.nvim_set_hl(0, "NeoTreeGitUntracked", { fg = colors.green })
+    vim.api.nvim_set_hl(0, "NeoTreeGitAdded", { fg = colors.green })
+    vim.api.nvim_set_hl(0, "NeoTreeGitDeleted", { fg = colors.red })
+    vim.api.nvim_set_hl(0, "NeoTreeGitConflict", { fg = colors.red, bold = true })
+
+    -- Диагностика (ошибки/предупреждения)
+    vim.api.nvim_set_hl(0, "NeoTreeDiagnosticError", { fg = colors.red })
+    vim.api.nvim_set_hl(0, "NeoTreeDiagnosticWarn", { fg = colors.yellow })
+    vim.api.nvim_set_hl(0, "NeoTreeDiagnosticInfo", { fg = colors.cyan })
+    vim.api.nvim_set_hl(0, "NeoTreeDiagnosticHint", { fg = colors.green })
+
+    require("neo-tree").setup(opts)
+  end,
+
   -- Горячие клавиши (загружаются вместе с плагином)
   keys = {
     -- Основные команды
@@ -204,6 +235,22 @@ return {
         enable_character_fade = true,
       },
 
+      -- Диагностика с пропагацией на родительские директории
+      diagnostics = {
+        symbols = {
+          hint = "󰌵",
+          info = "󰙎",
+          warn = "",
+          error = "",
+        },
+        highlights = {
+          hint = "NeoTreeDiagnosticHint",
+          info = "NeoTreeDiagnosticInfo",
+          warn = "NeoTreeDiagnosticWarn",
+          error = "NeoTreeDiagnosticError",
+        },
+      },
+
       -- Отступы и направляющие линии
       indent = {
         indent_size = 2,
@@ -249,7 +296,7 @@ return {
 
       -- Индикатор измененных файлов
       modified = {
-        symbol = "[+]",
+        symbol = "󰷉",
         highlight = "NeoTreeModified",
       },
 
@@ -264,10 +311,10 @@ return {
       git_status = {
         symbols = {
           -- Типы изменений (Change type)
-          added = "", -- U+271A - Новый файл
-          modified = "", -- U+2731 - Изменен
-          deleted = "", -- U+2716 - Удален
-          renamed = "", -- U+279C - Переименован
+          added = "", -- Новый файл
+          modified = "", -- Изменен
+          deleted = "", -- Удален
+          renamed = "󰑕", -- Переименован
 
           -- Статусы (Status type)
           untracked = "", -- U+2605 - Не отслеживается
@@ -449,6 +496,41 @@ return {
 
       -- Использовать libuv file watcher для лучшей производительности
       use_libuv_file_watcher = true,
+
+      -- Рендереры с диагностикой для подсветки родительских директорий
+      renderers = {
+        directory = {
+          { "indent" },
+          { "icon" },
+          { "current_filter" },
+          { "name", use_git_status_colors = true },
+          { "clipboard" },
+          {
+            "container",
+            content = {
+              { "diagnostics", errors_only = false, hide_when_expanded = false, zindex = 20 },
+              { "git_status", hide_when_expanded = false, zindex = 10 },
+            },
+            align = "right",
+          },
+        },
+        file = {
+          { "indent" },
+          { "icon" },
+          { "name", use_git_status_colors = true },
+          { "clipboard" },
+          { "bufnr" },
+          { "modified" },
+          {
+            "container",
+            content = {
+              { "diagnostics", zindex = 20 },
+              { "git_status", zindex = 10 },
+            },
+            align = "right",
+          },
+        },
+      },
 
       -- Группировать пустые директории в один узел
       group_empty_dirs = false,

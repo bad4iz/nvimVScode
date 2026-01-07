@@ -64,8 +64,8 @@ return {
           statusline = { "dashboard", "alpha", "starter" },
           winbar = {},
         },
-        component_separators = { left = "", right = "" },
-        section_separators = { left = "", right = "" },
+        component_separators = { left = "", right = "" },
+        section_separators = { left = "", right = "" },
       },
 
       sections = {
@@ -121,7 +121,7 @@ return {
               Error = "", -- Ошибка
               Warn = "", -- Предупреждение
               Hint = "󰌵", -- Подсказка
-              Info = "i", -- Информация
+              Info = "󰙎", -- Информация
             },
           },
         },

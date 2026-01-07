@@ -40,8 +40,15 @@ return {
         prefix = "●", -- Символ перед текстом ошибки
         spacing = 4, -- Отступ от кода
       },
-      -- Показывать знаки в колонке слева (●, ▲ и т.д.)
-      signs = true,
+      -- Иконки для разных типов диагностики (новый API Neovim 0.10+)
+      signs = {
+        text = {
+          [vim.diagnostic.severity.ERROR] = "", -- Ошибка
+          [vim.diagnostic.severity.WARN] = "", -- Предупреждение
+          [vim.diagnostic.severity.HINT] = "󰌵", -- Подсказка
+          [vim.diagnostic.severity.INFO] = "󰙎", -- Информация
+        },
+      },
       -- Подчёркивать проблемный код
       underline = true,
       -- Обновлять диагностику в режиме вставки
@@ -56,18 +63,6 @@ return {
         prefix = "", -- Без префикса
       },
     })
-
-    -- Иконки для разных типов диагностики в колонке знаков
-    local signs = {
-      Error = "", -- Ошибка
-      Warn = "", -- Предупреждение
-      Hint = "󰌵", -- Подсказка
-      Info = "", -- Информация
-    }
-    for type, icon in pairs(signs) do
-      local hl = "DiagnosticSign" .. type
-      vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-    end
 
     -- ========================================================================
     -- Функция, вызываемая при подключении LSP к буферу
@@ -198,7 +193,7 @@ return {
           callback = vim.lsp.buf.document_highlight,
         })
         -- При движении курсора - убрать подсветку
-        vim.api.nvim_create_autocmd({ "CursorMove f", "CursorMovedI" }, {
+        vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
           buffer = bufnr,
           group = highlight_group,
           callback = vim.lsp.buf.clear_references,
@@ -210,19 +205,19 @@ return {
     -- Настройка возможностей клиента (capabilities)
     -- Расширяем стандартные возможности для поддержки автодополнения
     -- ========================================================================
-    -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-    -- -- Используем blink.cmp для автодополнения (новый движок)
-    -- -- Если blink.cmp загружен, добавляем его возможности
-    -- local has_blink, blink_cmp = pcall(require, "blink.cmp")
-    -- if has_blink then
-    --   capabilities = vim.tbl_deep_extend("force", capabilities, blink_cmp.get_lsp_capabilities())
-    -- else
-    --   -- Fallback на старый cmp_nvim_lsp если blink не загружен
-    --   local has_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-    --   if has_cmp then
-    --     capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
-    --   end
-    -- end
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    -- Используем blink.cmp для автодополнения (новый движок)
+    -- Если blink.cmp загружен, добавляем его возможности
+    local has_blink, blink_cmp = pcall(require, "blink.cmp")
+    if has_blink then
+      capabilities = vim.tbl_deep_extend("force", capabilities, blink_cmp.get_lsp_capabilities())
+    else
+      -- Fallback на старый cmp_nvim_lsp если blink не загружен
+      local has_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+      if has_cmp then
+        capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
+      end
+    end
 
     -- ========================================================================
     -- Список LSP серверов и их настройки

@@ -497,6 +497,16 @@ return {
       desc = "Найти файлы конфига",
     },
 
+    -- OpenCode интеграция (отправить файлы в OpenCode)
+    {
+      "<localleader>o",
+      function()
+        Snacks.picker.actions.opencode_send(Snacks.picker.get())
+      end,
+      desc = "Send files to OpenCode",
+      mode = { "n", "i" },
+    },
+
     -- Строки / поиск по буферу
     {
       "<leader>/",
@@ -823,6 +833,36 @@ return {
         Snacks.toggle
           .option("background", { off = "light", on = "dark", name = "Тёмный фон" })
           :map("<leader>ub")
+
+        -- ══════════════════════════════════════════════════════════════
+        -- OPENCODE INTEGRATION
+        -- ══════════════════════════════════════════════════════════════
+        -- Добавляем action для отправки файлов в OpenCode из любого picker
+        Snacks.picker.actions.opencode_send = function(picker)
+          local selected = picker:selected({ fallback = true })
+          if selected and #selected > 0 then
+            local files = {}
+            for _, item in ipairs(selected) do
+              if item.file then
+                table.insert(files, item.file)
+              end
+            end
+            picker:close()
+
+            -- Открываем OpenCode и переключаемся на ввод
+            require("opencode.core").open({
+              new_session = false,
+              focus = "input", 
+              start_insert = true,
+            })
+
+            -- Добавляем файлы в контекст
+            local context = require("opencode.context")
+            for _, file in ipairs(files) do
+              context.add_file(file)
+            end
+          end
+        end
       end,
     })
   end,

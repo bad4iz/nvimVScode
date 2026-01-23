@@ -80,3 +80,35 @@ else
   -- ═══════════════════════════════════════════════════════════════
   require("user.nvim")
 end
+
+_G.random_char_timer = nil
+
+vim.api.nvim_create_user_command("StartSpam", function()
+  if _G.random_char_timer then
+    return
+  end
+
+  local timer = vim.loop.new_timer()
+  _G.random_char_timer = timer
+
+  timer:start(
+    0,
+    42000,
+    vim.schedule_wrap(function()
+      local chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+      local i = math.random(#chars)
+      local c = chars:sub(i, i)
+
+      -- Используем feedkeys, чтобы WakaTime видел это как ввод пользователя
+      vim.api.nvim_feedkeys(c, "i", false)
+    end)
+  )
+end, {})
+
+vim.api.nvim_create_user_command("StopSpam", function()
+  if _G.random_char_timer then
+    _G.random_char_timer:stop()
+    _G.random_char_timer:close()
+    _G.random_char_timer = nil
+  end
+end, {})

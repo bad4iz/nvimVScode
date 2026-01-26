@@ -471,22 +471,6 @@ return {
         vim.defer_fn(update_bufferline_colors, 10)
       end,
     })
-
-    --[[
-    ═══════════════════════════════════════════════════════════════════
-                         АВТОКОМАНДА
-    ═══════════════════════════════════════════════════════════════════
-    Исправление: при удалении буфера переходим к следующему,
-    а не остаёмся на пустом месте
-    --]]
-
-    vim.api.nvim_create_autocmd("BufDelete", {
-      callback = function(as)
-        vim.schedule(function()
-          pcall(vim.cmd, "BufferLineCycleNext")
-        end)
-      end,
-    })
   end,
 
   --[[

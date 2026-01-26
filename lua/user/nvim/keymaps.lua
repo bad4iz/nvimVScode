@@ -70,19 +70,17 @@ map("n", "<leader>q", "<cmd>confirm q<CR>", { desc = "Закрыть окно" }
 map("n", "<leader>Q", "<cmd>confirm qall<CR>", { desc = "Выйти из Neovim" })
 
 -- Буфер обмена (AstroNvim style)
-map({ "n", "v" }, "<leader>y", [["+y]], { desc = "Копировать в системный буфер" })
-map("n", "<leader>Y", [["+Y]], { desc = "Копировать строку в буфер" })
+-- y и p теперь в common/keymaps.lua для работы во всех режимах
 map({ "n", "v" }, "<leader>d", [["_d]], { desc = "Удалить в чёрную дыру" })
-map("x", "<leader>p", [["_dP]], { desc = "Вставить без замены буфера" })
 
--- Закрыть буфер (определяется в snacks.nvim, но добавим fallback)
+-- Закрыть буфер (используем snacks для сохранения разметки окон)
 map("n", "<leader>c", function()
   if pcall(require, "snacks") then
-    require("snacks").bufdelete()
+    Snacks.bufdelete()
   else
     vim.cmd("confirm bd")
   end
-end, { desc = "Закрыть буфер" })
+end, { desc = "Закрыть буфер (на предыдущий)" })
 
 map("n", "<leader>C", function()
   if pcall(require, "snacks") then

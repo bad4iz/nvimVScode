@@ -150,13 +150,7 @@ autocmd("LspAttach", {
   group = augroup("lsp_attach_custom", { clear = true }),
   callback = function(event)
     local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client and client.name == "eslint" then
-      -- Автоисправление ESLint при сохранении
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer = event.buf,
-        command = "EslintFixAll",
-      })
-    end
+    -- Здесь можно добавить специфичные настройки для других LSP
   end,
   desc = "Настройки при подключении LSP",
 })

@@ -1,3 +1,7 @@
+if true then
+  return {}
+end -- WARN: УДАЛИТЕ ЭТУ СТРОКУ ДЛЯ АКТИВАЦИИ TELESCOPE
+
 --[[
 Горячие клавиши для Claude Code (Leader = Space)
 

@@ -17,7 +17,6 @@
 
 Поддерживаемые форматтеры для веб-разработки:
   - prettier    : JS, TS, HTML, CSS, JSON, YAML, MD
-  - eslint_d    : JS, TS (исправление ошибок)
   - stylua      : Lua
 
 GitHub: https://github.com/stevearc/conform.nvim
@@ -35,10 +34,10 @@ return {
     -- ═══════════════════════════════════════════════════════════════
     formatters_by_ft = {
       -- JavaScript / TypeScript
-      javascript = { "prettier", "eslint_d" },
-      javascriptreact = { "prettier", "eslint_d" },
-      typescript = { "prettier", "eslint_d" },
-      typescriptreact = { "prettier", "eslint_d" },
+      javascript = { "prettier" },
+      javascriptreact = { "prettier" },
+      typescript = { "prettier" },
+      typescriptreact = { "prettier" },
       
       -- Веб
       html = { "prettier" },
@@ -106,13 +105,6 @@ return {
           "--single-quote",
           "--jsx-single-quote",
         },
-      },
-      
-      eslint_d = {
-        -- Использовать для исправления ошибок
-        command = "eslint_d",
-        args = { "--fix-to-stdout", "--stdin", "--stdin-filename", "$FILENAME" },
-        stdin = true,
       },
       
       stylua = {

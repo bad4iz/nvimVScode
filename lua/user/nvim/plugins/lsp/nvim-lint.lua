@@ -14,8 +14,7 @@
   :lua require('lint').try_lint()  - запустить линтер вручную
 
 Поддерживаемые линтеры:
-  - eslint_d    : JS, TS (быстрая версия eslint)
-  - stylelint   : CSS, SCSS
+   - stylelint   : CSS, SCSS
 
 GitHub: https://github.com/mfussenegger/nvim-lint
 =====================================================================
@@ -31,10 +30,10 @@ return {
     
     -- Линтеры по типам файлов
     linters_by_ft = {
-      javascript = { "eslint_d" },
-      javascriptreact = { "eslint_d" },
-      typescript = { "eslint_d" },
-      typescriptreact = { "eslint_d" },
+      javascript = {},
+      javascriptreact = {},
+      typescript = {},
+      typescriptreact = {},
       
       css = { "stylelint" },
       scss = { "stylelint" },
@@ -45,18 +44,7 @@ return {
     },
     
     -- Настройки линтеров
-    linters = {
-      eslint_d = {
-        -- Использовать локальный eslint если есть
-        cmd = function()
-          local local_eslint = vim.fn.getcwd() .. "/node_modules/.bin/eslint"
-          if vim.fn.executable(local_eslint) == 1 then
-            return local_eslint
-          end
-          return "eslint_d"
-        end,
-      },
-    },
+    linters = {},
   },
   
   config = function(_, opts)

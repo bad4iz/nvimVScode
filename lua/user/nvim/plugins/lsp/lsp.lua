@@ -112,7 +112,9 @@ return {
       map("<Leader>lI", "<cmd>Mason<cr>", "Информация о Mason")
 
       -- <Leader>la - показать доступные действия (исправления, импорты и т.д.)
-      map("<Leader>la", vim.lsp.buf.code_action, "Code Action (действия)")
+      map("<Leader>la", function()
+        vim.lsp.buf.code_action({ context = { only = { "quickfix", "refactor", "source" }, diagnostics = {} } })
+      end, "Code Action (действия)")
 
       -- <Leader>lA - показать только source actions (организация импортов и т.д.)
       map("<Leader>lA", function()
@@ -307,6 +309,15 @@ return {
       eslint = {
         settings = {
           workingDirectories = { mode = "auto" },
+          codeAction = {
+            disableRuleComment = {
+              enable = true,
+              location = "separateLine",
+            },
+            showDocumentation = {
+              enable = true,
+            },
+          },
         },
       },
       -- ─────────────────────────────────────────────────────────

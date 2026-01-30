@@ -37,16 +37,13 @@ return {
       "json-lsp",
       "yaml-language-server",
       "lua-language-server",
-      -- "eslint-lsp",
+      "eslint-lsp",
       "emmet-ls",
       "marksman", -- Markdown LSP
 
       -- Форматтеры (претиерд быстрее)
       "prettierd",
       "stylua",
-
-      -- Линтеры (демон для быстрой проверки)
-      "eslint_d",
     },
   },
 

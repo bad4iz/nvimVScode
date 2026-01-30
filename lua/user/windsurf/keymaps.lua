@@ -235,9 +235,6 @@ keymap("n", "<leader>fp", '<Cmd>call VSCodeNotify("workbench.action.quickOpenRec
   desc = "Открыть недавние проекты",
 })
 
--- Сортировка выделения
-vim.keymap.set("v", "gs", ":sort<CR>", { desc = "Сортировать" })
-
 -- Переход к ошибкам (VSCode markers)
 keymap("n", "ge", function()
   vim.fn.VSCodeNotify("editor.action.marker.next")

@@ -50,11 +50,11 @@ map("n", "<C-j>", "<C-w>j", { desc = "Переместиться в окно с�
 map("n", "<C-k>", "<C-w>k", { desc = "Переместиться в окно сверху" })
 map("n", "<C-l>", "<C-w>l", { desc = "Переместиться в окно справа" })
 
--- Изменение размера окон (AstroNvim: Ctrl + стрелки)
-map("n", "<C-Up>", "<cmd>resize -2<CR>", { desc = "Уменьшить высоту окна" })
-map("n", "<C-Down>", "<cmd>resize +2<CR>", { desc = "Увеличить высоту окна" })
-map("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Уменьшить ширину окна" })
-map("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Увеличить ширину окна" })
+-- Изменение размера окон (Alt + Ctrl + стрелки)
+map("n", "<M-C-Up>", "<cmd>resize -2<CR>", { desc = "Уменьшить высоту окна" })
+map("n", "<M-C-Down>", "<cmd>resize +2<CR>", { desc = "Увеличить высоту окна" })
+map("n", "<M-C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Уменьшить ширину окна" })
+map("n", "<M-C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Увеличить ширину окна" })
 
 -- =====================================================================
 -- ЛИДЕР ГРУППА (AstroNvim style)
@@ -70,19 +70,17 @@ map("n", "<leader>q", "<cmd>confirm q<CR>", { desc = "Закрыть окно" }
 map("n", "<leader>Q", "<cmd>confirm qall<CR>", { desc = "Выйти из Neovim" })
 
 -- Буфер обмена (AstroNvim style)
-map({ "n", "v" }, "<leader>y", [["+y]], { desc = "Копировать в системный буфер" })
-map("n", "<leader>Y", [["+Y]], { desc = "Копировать строку в буфер" })
+-- y и p теперь в common/keymaps.lua для работы во всех режимах
 map({ "n", "v" }, "<leader>d", [["_d]], { desc = "Удалить в чёрную дыру" })
-map("x", "<leader>p", [["_dP]], { desc = "Вставить без замены буфера" })
 
--- Закрыть буфер (определяется в snacks.nvim, но добавим fallback)
+-- Закрыть буфер (используем snacks для сохранения разметки окон)
 map("n", "<leader>c", function()
   if pcall(require, "snacks") then
-    require("snacks").bufdelete()
+    Snacks.bufdelete()
   else
     vim.cmd("confirm bd")
   end
-end, { desc = "Закрыть буфер" })
+end, { desc = "Закрыть буфер (на предыдущий)" })
 
 map("n", "<leader>C", function()
   if pcall(require, "snacks") then
@@ -303,9 +301,6 @@ map("v", ">", ">gv", { desc = "Сдвиг вправо" })
 -- Перемещение строк вверх/вниз (AstroNvim style)
 map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Переместить строку вниз" })
 map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Переместить строку вверх" })
-
--- Сортировка (AstroNvim style)
-map("v", "gs", ":sort<CR>", { desc = "Сортировать выделение" })
 
 -- =====================================================================
 -- ТЕРМИНАЛ (AstroNvim style)

@@ -150,11 +150,132 @@ autocmd("LspAttach", {
   group = augroup("lsp_attach_custom", { clear = true }),
   callback = function(event)
     local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client and client.name == "eslint" then
-      -- Автоисправление ESLint при сохранении
+    if not client then
+      return
+    end
+
+    local bufnr = event.buf
+
+    -- -----------------------------------------------------------------
+    -- LSP keymaps (AstroNvim style)
+    -- We set them here because in Nvim 0.11 + mason-lspconfig v2 servers
+    -- are enabled via vim.lsp.enable(), so per-server on_attach in our
+    -- old lspconfig setup may never run.
+    -- -----------------------------------------------------------------
+    local map = function(mode, lhs, rhs, desc)
+      vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+    end
+
+    -- Navigation
+    map("n", "gd", vim.lsp.buf.definition, "LSP: Перейти к определению")
+    map("n", "gD", vim.lsp.buf.declaration, "LSP: Перейти к объявлению")
+    map("n", "gri", vim.lsp.buf.implementation, "LSP: Перейти к реализации")
+    map("n", "grr", vim.lsp.buf.references, "LSP: Показать использования")
+    map("n", "gy", vim.lsp.buf.type_definition, "LSP: Перейти к определению типа")
+
+    -- Info
+    map("n", "K", vim.lsp.buf.hover, "LSP: Показать документацию")
+    map("n", "gK", vim.lsp.buf.signature_help, "LSP: Сигнатура функции")
+    map("n", "<Leader>lh", vim.lsp.buf.signature_help, "LSP: Сигнатура функции")
+
+    -- LSP menu
+    map("n", "<Leader>li", "<cmd>LspInfo<cr>", "LSP: Информация")
+    map("n", "<Leader>lI", "<cmd>Mason<cr>", "LSP: Mason")
+
+    map({ "n", "v" }, "<Leader>la", vim.lsp.buf.code_action, "LSP: Действия кода")
+    map({ "n", "v" }, "<Leader>lA", function()
+      vim.lsp.buf.code_action({ context = { only = { "source" } } })
+    end, "LSP: Source Action")
+
+    map({ "n", "v" }, "<Leader>lf", function()
+      -- Prefer ESLint fixes (includes Prettier via eslint-plugin-prettier) when available.
+      local has_eslint = false
+      for _, c in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+        if c.name == "eslint" then
+          has_eslint = true
+          break
+        end
+      end
+
+      if has_eslint and vim.fn.exists(":EslintFixAll") == 2 then
+        pcall(vim.cmd, "EslintFixAll")
+        return
+      end
+
+      local ok, conform = pcall(require, "conform")
+      if ok then
+        conform.format({ async = true, lsp_fallback = true })
+      else
+        vim.lsp.buf.format({ async = true })
+      end
+    end, "LSP: Форматировать")
+
+    map("n", "<Leader>lr", vim.lsp.buf.rename, "LSP: Переименовать символ")
+
+    -- Diagnostics
+    map("n", "<Leader>ld", vim.diagnostic.open_float, "LSP: Диагностика строки")
+    map("n", "<Leader>lD", "<cmd>Telescope diagnostics bufnr=0<cr>", "LSP: Диагностика буфера")
+
+    -- CodeLens
+    map("n", "<Leader>ll", vim.lsp.codelens.refresh, "LSP: Обновить CodeLens")
+    map("n", "<Leader>lL", vim.lsp.codelens.run, "LSP: Запустить CodeLens")
+
+    -- Symbols
+    map("n", "<Leader>ls", vim.lsp.buf.document_symbol, "LSP: Символы документа")
+    map("n", "<Leader>lG", vim.lsp.buf.workspace_symbol, "LSP: Символы проекта")
+    map("n", "<Leader>lS", "<cmd>LspRestart<cr>", "LSP: Перезапустить LSP")
+
+    -- Highlight symbol under cursor (if supported)
+    if client.server_capabilities and client.server_capabilities.documentHighlightProvider then
+      local highlight_group = vim.api.nvim_create_augroup("LSPDocumentHighlight", { clear = false })
+      vim.api.nvim_clear_autocmds({ group = highlight_group, buffer = bufnr })
+      vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+        buffer = bufnr,
+        group = highlight_group,
+        callback = vim.lsp.buf.document_highlight,
+      })
+      vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        buffer = bufnr,
+        group = highlight_group,
+        callback = vim.lsp.buf.clear_references,
+      })
+    end
+
+    -- -----------------------------------------------------------------
+    -- ESLint: auto-fix on save (single source of truth: eslint-lsp)
+    -- In Nvim 0.11 the eslint config provides buffer-local :LspEslintFixAll.
+    -- -----------------------------------------------------------------
+    if client.name == "eslint" then
+      local function eslint_fix_all()
+        local params = {
+          command = "eslint.applyAllFixes",
+          arguments = {
+            {
+              uri = vim.uri_from_bufnr(bufnr),
+              version = vim.lsp.util.buf_versions[bufnr],
+            },
+          },
+        }
+
+        -- Default `client:request_sync()` timeout is 1000ms, which is often too
+        -- small for TypeScript projects (it just silently times out).
+        client:request_sync("workspace/executeCommand", params, 10000, bufnr)
+      end
+
+      -- Provide a familiar command name for manual use.
+      pcall(vim.api.nvim_buf_create_user_command, bufnr, "EslintFixAll", eslint_fix_all, {
+        desc = "ESLint: Fix all auto-fixable problems",
+      })
+
+      local group = vim.api.nvim_create_augroup("LspEslintFixAll", { clear = false })
+      vim.api.nvim_clear_autocmds({ group = group, buffer = bufnr })
       vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer = event.buf,
-        command = "EslintFixAll",
+        group = group,
+        buffer = bufnr,
+        callback = function()
+          pcall(eslint_fix_all)
+        end,
+        desc = "ESLint: Fix all auto-fixable problems",
       })
     end
   end,

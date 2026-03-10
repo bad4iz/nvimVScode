@@ -138,7 +138,7 @@ return {
           -- Статус Supermaven
           {
             supermaven_status,
-            color = { fg = colors.green },
+            color = { fg = "#d787ff" },
           },
         },
 
@@ -149,6 +149,9 @@ return {
         },
 
         lualine_z = {
+          {
+            require("opencode").statusline,
+          },
           { "location" },
           { "progress" },
         },

@@ -17,7 +17,6 @@
 
 Поддерживаемые форматтеры для веб-разработки:
   - prettier    : JS, TS, HTML, CSS, JSON, YAML, MD
-  - eslint_d    : JS, TS (исправление ошибок)
   - stylua      : Lua
 
 GitHub: https://github.com/stevearc/conform.nvim
@@ -26,7 +25,8 @@ GitHub: https://github.com/stevearc/conform.nvim
 
 return {
   "stevearc/conform.nvim",
-  event = { "BufWritePre" },
+  -- Load before first save so format_on_save works immediately
+  event = { "BufReadPre", "BufNewFile" },
   cmd = { "ConformInfo" },
   
   opts = {
@@ -35,32 +35,34 @@ return {
     -- ═══════════════════════════════════════════════════════════════
     formatters_by_ft = {
       -- JavaScript / TypeScript
-      javascript = { "prettier", "eslint_d" },
-      javascriptreact = { "prettier", "eslint_d" },
-      typescript = { "prettier", "eslint_d" },
-      typescriptreact = { "prettier", "eslint_d" },
+      -- ESLint fixes are handled by eslint-lsp (:EslintFixAll) in lsp.lua.
+      -- Formatting is handled by prettierd.
+      javascript = { "prettierd" },
+      javascriptreact = { "prettierd" },
+      typescript = { "prettierd" },
+      typescriptreact = { "prettierd" },
       
       -- Веб
-      html = { "prettier" },
-      css = { "prettier" },
-      scss = { "prettier" },
-      less = { "prettier" },
+      html = { "prettierd" },
+      css = { "prettierd" },
+      scss = { "prettierd" },
+      less = { "prettierd" },
       
       -- Данные
-      json = { "prettier" },
-      jsonc = { "prettier" },
-      yaml = { "prettier" },
+      json = { "prettierd" },
+      jsonc = { "prettierd" },
+      yaml = { "prettierd" },
       
       -- Markdown
-      markdown = { "prettier" },
-      ["markdown.mdx"] = { "prettier" },
+      markdown = { "prettierd" },
+      ["markdown.mdx"] = { "prettierd" },
       
       -- Vue / Svelte
-      vue = { "prettier" },
-      svelte = { "prettier" },
+      vue = { "prettierd" },
+      svelte = { "prettierd" },
       
       -- GraphQL
-      graphql = { "prettier" },
+      graphql = { "prettierd" },
       
       -- Lua
       lua = { "stylua" },
@@ -91,30 +93,27 @@ return {
     -- НАСТРОЙКИ ФОРМАТТЕРОВ
     -- ═══════════════════════════════════════════════════════════════
     formatters = {
-      prettier = {
-        -- Использовать локальный prettier если есть
+      -- Prefer prettierd (installed via Mason), but fall back to local prettier.
+      prettierd = {
         command = function()
+          local prettierd = vim.fn.exepath("prettierd")
+          if prettierd and prettierd ~= "" then
+            return prettierd
+          end
+
           local local_prettier = vim.fn.getcwd() .. "/node_modules/.bin/prettier"
           if vim.fn.executable(local_prettier) == 1 then
             return local_prettier
           end
+
           return "prettier"
         end,
-        
-        -- Дополнительные аргументы
         prepend_args = {
           "--single-quote",
           "--jsx-single-quote",
         },
       },
-      
-      eslint_d = {
-        -- Использовать для исправления ошибок
-        command = "eslint_d",
-        args = { "--fix-to-stdout", "--stdin", "--stdin-filename", "$FILENAME" },
-        stdin = true,
-      },
-      
+
       stylua = {
         prepend_args = {
           "--indent-type", "Spaces",

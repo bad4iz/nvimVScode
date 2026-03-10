@@ -12,11 +12,23 @@
 return {
   "sQVe/sort.nvim",
   lazy = false,
+  keys = {
+    { "gs", function() require("sort").sort() end, mode = { "n", "v" }, desc = "Сортировать" },
+  },
   -- Optional setup for overriding defaults.
   config = function()
     require("sort").setup {
-      -- Input configuration here.
-      -- Refer to the configuration section below for options.
+      mappings = {
+        operator = "gs",
+        textobject = {
+          inner = "is",
+          around = "as",
+        },
+        motion = {
+          next_delimiter = "]s",
+          prev_delimiter = "[s",
+        },
+      },
     }
   end,
 }

@@ -16,6 +16,8 @@ GitHub: https://github.com/williamboman/mason.nvim
 
 return {
   "williamboman/mason.nvim",
+  -- Load early so ensure_installed runs automatically
+  event = { "BufReadPre", "BufNewFile" },
   cmd = "Mason",
   build = ":MasonUpdate",
 
@@ -37,16 +39,13 @@ return {
       "json-lsp",
       "yaml-language-server",
       "lua-language-server",
-      -- "eslint-lsp",
+      "eslint-lsp",
       "emmet-ls",
       "marksman", -- Markdown LSP
 
       -- Форматтеры (претиерд быстрее)
       "prettierd",
       "stylua",
-
-      -- Линтеры (демон для быстрой проверки)
-      "eslint_d",
     },
   },
 

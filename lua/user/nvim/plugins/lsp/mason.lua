@@ -16,6 +16,8 @@ GitHub: https://github.com/williamboman/mason.nvim
 
 return {
   "williamboman/mason.nvim",
+  -- Load early so ensure_installed runs automatically
+  event = { "BufReadPre", "BufNewFile" },
   cmd = "Mason",
   build = ":MasonUpdate",
 

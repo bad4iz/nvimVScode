@@ -112,14 +112,16 @@ return {
       map("<Leader>lI", "<cmd>Mason<cr>", "Информация о Mason")
 
       -- <Leader>la - показать доступные действия (исправления, импорты и т.д.)
-      map("<Leader>la", function()
-        vim.lsp.buf.code_action({ context = { only = { "quickfix", "refactor", "source" }, diagnostics = {} } })
-      end, "Code Action (действия)")
+      vim.keymap.set({ "n", "v" }, "<Leader>la", function()
+        -- Do not override `context.diagnostics` with an empty list,
+        -- otherwise ESLint quickfix actions (and other diagnostic-based actions) won't show up.
+        vim.lsp.buf.code_action({ context = { only = { "quickfix", "refactor", "source" } } })
+      end, { buffer = bufnr, desc = "LSP: Code Action (действия)" })
 
       -- <Leader>lA - показать только source actions (организация импортов и т.д.)
-      map("<Leader>lA", function()
-        vim.lsp.buf.code_action({ context = { only = { "source" }, diagnostics = {} } })
-      end, "Source Action")
+      vim.keymap.set({ "n", "v" }, "<Leader>lA", function()
+        vim.lsp.buf.code_action({ context = { only = { "source" } } })
+      end, { buffer = bufnr, desc = "LSP: Source Action" })
 
       -- <Leader>lr - переименовать символ во всём проекте
       map("<Leader>lr", vim.lsp.buf.rename, "Переименовать символ")
@@ -129,8 +131,29 @@ return {
 
       -- <Leader>lf - отформатировать текущий буфер
       map("<Leader>lf", function()
-        vim.lsp.buf.format({ async = true })
+        local ok, conform = pcall(require, "conform")
+        if ok then
+          conform.format({ async = true, lsp_fallback = true })
+        else
+          vim.lsp.buf.format({ async = true })
+        end
       end, "Форматировать буфер")
+
+      -- ESLint: auto-fix (source.fixAll) on save
+      -- Это именно eslint --fix (правки правил), а не prettier форматирование.
+      if client.name == "eslint" then
+        local group = vim.api.nvim_create_augroup("LspEslintFixAll", { clear = false })
+        vim.api.nvim_clear_autocmds({ group = group, buffer = bufnr })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          group = group,
+          buffer = bufnr,
+          callback = function()
+            -- Команда добавляется lspconfig'ом для eslint-lsp
+            pcall(vim.cmd, "EslintFixAll")
+          end,
+          desc = "ESLint: Fix all auto-fixable problems",
+        })
+      end
 
       -- <Leader>ll - обновить CodeLens (если поддерживается)
       map("<Leader>ll", vim.lsp.codelens.refresh, "Обновить CodeLens")

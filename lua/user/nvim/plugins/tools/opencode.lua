@@ -107,39 +107,6 @@ return {
   config = function()
     vim.o.autoread = true
 
-    -- opencode.nvim при поиске запущенного сервера синхронно дергает
-    -- `curl http://localhost:<port>/path`.
-    -- Если у вас остался "залипший" opencode-процесс (порт слушает, но /path не отвечает),
-    -- Neovim выглядит как зависший. Добавляем жесткий таймаут на этот probe.
-    local ok_client, client = pcall(require, "opencode.cli.client")
-    if ok_client and not client.__nvim_timeout_patch then
-      client.__nvim_timeout_patch = true
-      local ok_util, util = pcall(require, "opencode.util")
-      if ok_util then
-        client.get_path = function(port)
-          local curl_result = vim
-            .system({
-              "curl",
-              "-s",
-              "--connect-timeout",
-              "1",
-              "--max-time",
-              "2",
-              "http://localhost:" .. tostring(port) .. "/path",
-            })
-            :wait()
-          util.check_system_call(curl_result, "curl")
-
-          local path_ok, path_data = pcall(vim.fn.json_decode, curl_result.stdout)
-          if path_ok and (path_data.directory or path_data.worktree) then
-            return path_data
-          end
-
-          error("Failed to parse `opencode` CWD data: " .. (curl_result.stdout or ""), 0)
-        end
-      end
-    end
-
     vim.g.opencode_opts = {
       -- Custom prompts for opencode.nvim (shown in the "Prompts" section).
       -- `@this` is expanded by the plugin to the current file/selection context.

@@ -30,35 +30,17 @@ return {
     
     -- Линтеры по типам файлов
     linters_by_ft = {
-      javascript = {},
-      javascriptreact = {},
-      typescript = {},
-      typescriptreact = {},
-      
-      css = { "stylelint" },
-      scss = { "stylelint" },
-      
-      -- Можно добавить другие:
-      -- python = { "ruff", "mypy" },
-      -- go = { "golangcilint" },
+      -- ESLint диагностика/quickfix берём из eslint-lsp (nvim-lspconfig).
+      -- nvim-lint можно использовать для не-LSP линтеров (stylelint и т.д.)
     },
-    
-    -- Настройки линтеров
-    linters = {},
   },
   
   config = function(_, opts)
     local lint = require("lint")
+
     
     -- Настраиваем линтеры
     lint.linters_by_ft = opts.linters_by_ft
-    
-    -- Настраиваем отдельные линтеры
-    for name, config in pairs(opts.linters or {}) do
-      if type(config) == "table" and lint.linters[name] then
-        lint.linters[name] = vim.tbl_deep_extend("force", lint.linters[name], config)
-      end
-    end
     
     -- Функция для запуска линтера
     local function lint_buffer()

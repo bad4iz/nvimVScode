@@ -62,6 +62,7 @@ return {
       preset = {
         keys = {
           { icon = " ", key = "n", desc = "Новый файл", action = "<leader>n" },
+          { icon = " ", key = "e", desc = "Neo-tree", action = "<leader>e" },
           { icon = " ", key = "f", desc = "Найти файл", action = "<leader>ff" },
           { icon = " ", key = "o", desc = "Недавние файлы (проект)", action = "<leader>fo" },
           { icon = " ", key = "O", desc = "Недавние файлы (все)", action = "<leader>fO" },

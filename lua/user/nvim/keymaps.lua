@@ -262,6 +262,12 @@ end, { desc = "Следующая диагностика" })
 map("n", "[d", function()
   vim.diagnostic.goto_prev()
 end, { desc = "Предыдущая диагностика" })
+map("n", "ge", function()
+  vim.diagnostic.goto_next()
+end, { desc = "Следующая ошибка или warning" })
+map("n", "gE", function()
+  vim.diagnostic.goto_prev()
+end, { desc = "Предыдущая ошибка или warning" })
 
 -- Навигация по ошибкам
 map("n", "]e", function()

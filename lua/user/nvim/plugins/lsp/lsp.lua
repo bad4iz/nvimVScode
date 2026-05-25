@@ -179,11 +179,11 @@ return {
       -- <Leader>lD - показать все ошибки в буфере
       map("<Leader>lD", "<cmd>Telescope diagnostics bufnr=0<cr>", "Диагностика буфера")
 
-      -- [d - перейти к предыдущей ошибке/предупреждению
-      map("gE", vim.diagnostic.goto_prev, "Предыдущая ошибка")
+      -- gE - перейти к предыдущей ошибке/предупреждению
+      map("gE", vim.diagnostic.goto_prev, "Предыдущая ошибка или warning")
 
-      -- ]d - перейти к следующей ошибке/предупреждению
-      map("ge", vim.diagnostic.goto_next, "Следующая ошибка")
+      -- ge - перейти к следующей ошибке/предупреждению
+      map("ge", vim.diagnostic.goto_next, "Следующая ошибка или warning")
 
       -- ]e / [e - навигация только по ошибкам (без предупреждений)
       map("]e", function()

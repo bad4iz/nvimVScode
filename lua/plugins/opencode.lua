@@ -1,134 +1,52 @@
--- =============================================================================
---                            OPENCODE.NVIM
--- =============================================================================
--- Интеграция OpenCode AI ассистента с Neovim.
+-- OpenCode integration for Neovim.
+-- Docs: https://github.com/NickvanDyke/opencode.nvim
 --
--- Зависимости:
--- - snacks.nvim     - терминал, picker, input, UI
--- - blink.cmp       - автодополнение
--- - render-markdown - рендеринг markdown ответов
---
--- Установка OpenCode CLI:
---   npm install -g @opencode/cli
---
--- Горячие клавиши (Leader = Space):
---
--- 📂 Главное меню:
---   <leader>o - Показать группу "AI/OpenCode" в which-key
---
--- 🚀 Основные действия:
---   <C-a>      - Задать вопрос opencode
---   <C-x>      - Выполнить действие opencode
---   <C-.>      - Показать/скрыть opencode
---
--- 📝 Управление контекстом:
---   go         - Добавить диапазон к opencode (operator pending)
---   goo        - Добавить строку к opencode (operator pending)
---   goo        - Добавить строку к opencode (operator pending)
---
--- ↔️  Прокрутка:
---   <S-C-u>    - Прокрутить opencode вверх
---   <S-C-d>    - Прокрутить opencode вниз
---
--- ➕➖ Математика:
---   +          - Инкремент под курсором
---   -          - Декремент под курсором
--- =============================================================================
-
 return {
-  "NickvanDyke/opencode.nvim",
-  dependencies = {
-    { "folke/snacks.nvim", opts = { input = {}, picker = {}, terminal = {} } },
-  },
-  opts = {},
-  keys = {
-    { "<leader>O", nil, desc = "AI/OpenCode" },
-    {
-      "<C-a>",
-      function()
-        require("opencode").ask("@this: ", { submit = true })
-      end,
-      mode = { "n", "x" },
-      desc = "Задать вопрос opencode",
-    },
-    {
-      "<C-x>",
-      function()
-        require("opencode").select()
-      end,
-      mode = { "n", "x" },
-      desc = "Выполнить действие opencode",
-    },
-    {
-      "<C-.>",
-      function()
-        require("opencode").toggle()
-      end,
-      mode = { "n", "t" },
-      desc = "Показать/скрыть opencode",
-    },
-    {
-      "go",
-      function()
-        return require("opencode").operator("@this ")
-      end,
-      mode = "n",
-      expr = true,
-      desc = "Добавить диапазон к opencode",
-    },
-    {
-      "goo",
-      function()
-        return require("opencode").operator("@this ") .. "_"
-      end,
-      mode = "n",
-      expr = true,
-      desc = "Добавить строку к opencode",
-    },
-    {
-      "<S-C-u>",
-      function()
-        require("opencode").command("session.half.page.up")
-      end,
-      mode = "n",
-      desc = "Прокрутить opencode вверх",
-    },
-    {
-      "<S-C-d>",
-      function()
-        require("opencode").command("session.half.page.down")
-      end,
-      mode = "n",
-      desc = "Прокрутить opencode вниз",
-    },
-    { "+", "<C-a>", mode = "n", desc = "Инкремент под курсором", noremap = true },
-    { "-", "<C-x>", mode = "n", desc = "Декремент под курсором", noremap = true },
-  },
+  "nickjvandyke/opencode.nvim",
+  -- Defaults to "main", supporting OpenCode v2.
+  -- Uncomment to pull the latest stable release, supporting OpenCode v1.
+  -- version = "*",
   config = function()
-    vim.o.autoread = true
-
+    ---@type opencode.Opts
     vim.g.opencode_opts = {
-      -- Custom prompts for opencode.nvim (shown in the "Prompts" section).
-      -- `@this` is expanded by the plugin to the current file/selection context.
-      prompts = {
-        -- Override the built-in `test` prompt to route through our strict command.
-        test = { prompt = "/test-react @this", submit = true },
-      },
-      provider = {
-        enabled = "snacks",
-        snacks = {
-          win = {
-            position = "bottom",
-            enter = false,
-            wo = {
-              winbar = "",
-            },
-            bo = {
-              filetype = "opencode_terminal",
-            },
-          },
+      -- Промпты, видимые в секции PROMPTS меню select() (<C-x>).
+      -- "..." в конце не отправляется, а открывает ask() с остальным текстом,
+      -- поэтому пункт "this" открывает окно ввода уже с предзаполненным "@this ".
+      select = {
+        prompts = {
+          this = "@this ...",
         },
       },
     }
+
+    -- Рекомендуемые/примерные биндинги
+    -- <C-a> в обычном и визуальном режиме: открывает окно запроса, в которое сразу
+    -- подставлен текущий буфер ("@this: " упоминает файл), чтобы запрос сразу шёл
+    -- с контекстом текущего файла.
+    vim.keymap.set(
+      { "n", "x" },
+      "<C-a>",
+      function() require("opencode").ask "@this: " end,
+      { desc = "Ask OpenCode…" }
+    )
+    -- <C-x> в обычном и визуальном режиме: открывает список выбора OpenCode,
+    -- например чтобы выбрать сессию или провайдера во всплывающем окне.
+    vim.keymap.set({ "n", "x" }, "<C-x>", function() require("opencode").select() end, { desc = "Select OpenCode…" })
+    -- "go" — оператор (expr = true возвращает motion), поэтому работает как `go<motion>`
+    -- и отправляет в OpenCode любой выделенный диапазон, например `goyy` или `govj`.
+    vim.keymap.set(
+      { "n", "x" },
+      "go",
+      function() return require("opencode").operator "@this" end,
+      { desc = "Send range to OpenCode", expr = true }
+    )
+    -- "goo" в обычном режиме: сокращение для текущей строки — "@this_" выбирает всю
+    -- строку, а не только символы под курсором.
+    vim.keymap.set(
+      { "n" },
+      "goo",
+      function() return require("opencode").operator "@this" .. "_" end,
+      { desc = "Send line to OpenCode", expr = true }
+    )
   end,
 }

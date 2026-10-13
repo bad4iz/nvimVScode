@@ -1,171 +1,51 @@
-# 🚀 Neovim Configuration
+# Neovim — AstroNvim v6
 
-Персональная конфигурация Neovim для **веб-разработки**, оптимизированная для работы с **Windsurf**, **VSCode** и **standalone Neovim**.
+Конфигурация на базе [AstroNvim](https://github.com/AstroNvim/AstroNvim).
+Сохраняет Lua/Dart-настройки и добавляет PHP/Laravel, Blade, Vue и OpenCode V2.
 
-## 📑 Содержание
+## Требования
 
-- [Особенности](#-особенности)
-- [Требования](#-требования)
-- [Установка](#-установка)
-- [Структура](#-структура)
-- [Горячие клавиши](#️-горячие-клавиши)
-- [Документация](#-документация)
-- [Переключение Telescope/Snacks.picker](#-переключение-telescopesnackspicker)
-- [Комментарии на русском](#-комментарии-на-русском)
-- [Лицензия](#-лицензия)
+- Neovim >= 0.12.0, Git, Nerd Font.
+- Node.js для веб-LSP и форматтеров.
+- ripgrep для поиска, C-компилятор и tree-sitter CLI для парсеров.
+- PHP CLI нужен для запуска Laravel, Artisan, тестов и проектного Pint.
 
-## ✨ Особенности
+## Установка
 
-- 🎯 **Два режима работы**:
-  - VSCode/Windsurf (через vscode-neovim)
-  - Standalone Neovim (полная IDE)
-- ⚡ **Быстрый запуск** благодаря lazy.nvim
-- 🎨 **Красивый UI** с tokyonight, lualine, bufferline
-- 🛠️ **Веб-разработка**: React, TypeScript, Vue, PHP/Laravel и Blade
-- 🤖 **AI автодополнение** через Supermaven
-- 📁 **Современные плагины** конца 2025 года
+Сохраните свою текущую конфигурацию, затем клонируйте репозиторий:
 
-## 📋 Требования
-
-- Neovim >= 0.12.0
-- Git >= 2.19.0
-- [Nerd Font](https://www.nerdfonts.com/) (для иконок)
-- Node.js (для LSP серверов)
-- ripgrep (для поиска)
-
-## 📦 Установка
-
-```bash
-# Бэкап текущей конфигурации
-mv ~/.config/nvim ~/.config/nvim.bak
-
-# Клонирование
-git clone git@github.com:bad4iz/nvimVScode.git ~/.config/nvim
-
-# Запуск Neovim (плагины установятся автоматически)
+```sh
+git clone https://github.com/bad4iz/nvimVScode ~/.config/nvim
 nvim
 ```
 
-## 📂 Структура
+Дождитесь установки плагинов и инструментов Mason. После первой установки
+Vue Language Server перезапустите Neovim.
 
-```
-~/.config/nvim/
-├── init.lua                    # Точка входа
-└── lua/user/
-    ├── common/                 # 🔗 Общие настройки (оба режима)
-    │   ├── options.lua         # Базовые vim опции
-    │   ├── keymaps.lua         # Общие сочетания клавиш
-    │   └── plugins/
-    │       ├── flash.lua       # Быстрая навигация
-    │       ├── nvim-surround.lua
-    │       ├── nvim-toggler.lua
-    │       ├── mini-ai.lua
-    │       └── vim-repeat.lua
-    │
-    ├── windsurf/               # 🆚 Только для VSCode/Windsurf
-    │   ├── settings.lua
-    │   └── keymaps.lua
-    │
-    └── nvim/                   # 🖥️ Только для standalone
-        ├── options.lua
-        ├── autocmds.lua
-        └── plugins/            # Плагины по категориям
-            ├── completion/     # 🤖 Автодополнение
-            │   ├── blink-cmp.lua
-            │   ├── luasnip.lua
-            │   └── supermaven.lua
-            │
-            ├── editor/         # ✏️ Редактирование
-            │   ├── autopairs.lua
-            │   ├── comment.lua
-            │   └── surround.lua
-            │
-            ├── git/            # 🔀 Git интеграция
-            │   └── gitsigns.lua
-            │
-            ├── lang/           # 🌐 Языки и синтаксис
-            │   ├── treesitter.lua
-            │   ├── markdown.lua
-            │   └── spell.lua
-            │
-            ├── lsp/            # 🛠️ LSP и линтинг
-            │   ├── lsp.lua
-            │   ├── mason.lua
-            │   ├── conform.lua
-            │   └── trouble.lua
-            │
-            ├── tools/          # 🔧 Инструменты
-            │   ├── neo-tree.lua
-            │   ├── snacks.lua
-            │   └── telescope.lua
-            │
-            └── ui/             # 🎨 Интерфейс
-                ├── tokyonight.lua
-                ├── lualine.lua
-                ├── bufferline.lua
-                └── which-key.lua
-```
+## Структура
 
-## ⌨️ Горячие клавиши
+- `init.lua` → `lua/lazy_setup.lua` → `lua/polish.lua`.
+- `lua/community.lua` — пакеты AstroCommunity (Lua и Dart).
+- `lua/plugins/` — настройки плагинов поверх AstroNvim.
+- `lua/plugins/web-development.lua` — PHP/Blade/Vue, LSP и форматирование.
+- `lua/plugins/opencode.lua` — OpenCode V2, хоткеи и `ask_this`.
+- `lua/plugins/snacks.lua` — выбранные файлы picker в вопрос OpenCode.
 
-**Лидер-клавиша**: `<Space>`
+Старая структура `lua/user/` больше не используется.
 
-### Общие (работают везде)
+## OpenCode
 
-| Клавиша            | Описание                          |
-| ------------------ | --------------------------------- |
-| `s`                | Flash: прыжок к символу           |
-| `S`                | Flash: Treesitter выбор           |
-| `ys{motion}{char}` | Окружить текст                    |
-| `ds{char}`         | Удалить окружение                 |
-| `cs{old}{new}`     | Изменить окружение                |
-| `<leader>i`        | Переключить значение (true/false) |
+- `Ctrl+A` — вопрос с готовым `@this: `.
+- `Ctrl+X` — меню; третий пункт `ask_this` открывает вопрос с `@this: `.
+- `go` / `goo` — отправить диапазон / текущую строку.
+- В Snacks picker `,o` — добавить выбранные файлы в вопрос.
+- `:checkhealth opencode` — проверить подключение.
 
-### Standalone Neovim
+Плагин выбирает последнюю обновлённую сессию для текущей папки Neovim (`:pwd`),
+а не обязательно чат, открытый в соседней вкладке. Изменённые файлы сохраняйте
+перед отправкой — OpenCode читает их с диска.
 
-| Клавиша      | Описание              |
-| ------------ | --------------------- |
-| `<leader>ff` | Найти файлы           |
-| `<leader>fg` | Поиск текста (grep)   |
-| `<leader>fb` | Буферы                |
-| `<leader>e`  | Файловый менеджер     |
-| `<leader>gg` | Lazygit               |
-| `gd`         | Перейти к определению |
-| `gr`         | Найти ссылки          |
-| `K`          | Документация          |
-| `<leader>la` | Действия кода         |
-| `<leader>lf` | Форматировать         |
+## PHP, Laravel и Vue
 
-## 📚 Документация
-
-Подробные руководства по использованию:
-
-| Документ | Описание |
-| -------- | -------- |
-| [⌨️ Горячие клавиши](MAPPINGS.md) | Полный справочник всех сочетаний клавиш (AstroNvim style) |
-| [🧭 Навигация](docs/navigation.md) | Поиск файлов, прыжки, LSP навигация |
-| [🎯 Мультикурсор](docs/multicursor.md) | Множественные курсоры и выделения |
-| [🤖 AI автодополнение](docs/ai-completion.md) | Supermaven и AI помощники |
-| [📋 Quickfix](docs/quickfix.md) | Работа со списком ошибок |
-| [🐘 PHP, Laravel и Vue](docs/php-laravel-vue.md) | LSP, Blade, форматирование и требования проекта |
-
-## 🔌 Переключение Telescope/Snacks.picker
-
-По умолчанию используется **snacks.picker**. Для переключения на Telescope:
-
-1. Откройте `lua/user/nvim/plugins/telescope.lua`
-2. Удалите строку: `if true then return {} end`
-3. Отключите picker в snacks.lua
-
-## 📝 Комментарии на русском
-
-Все файлы конфигурации содержат подробные комментарии на русском языке с описанием:
-
-- Назначения плагина
-- Способов использования
-- Горячих клавиш
-- Ссылок на документацию
-
-## 📄 Лицензия
-
-MIT
+[Настройки, требования проекта и проверка](docs/php-laravel-vue.md).
+Лидер — `Space`, локальный лидер — `,`. Навигацию и остальные хоткеи предоставляет AstroNvim.

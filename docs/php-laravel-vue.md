@@ -1,6 +1,7 @@
 # PHP, Laravel и Vue
 
-Поддержка включена в standalone Neovim. Открывайте редактор из корня проекта:
+Поддержка настроена в `lua/plugins/web-development.lua` поверх AstroNvim v6.
+Открывайте редактор из корня проекта:
 
 ```bash
 nvim .
@@ -16,7 +17,7 @@ nvim .
 
 Mason автоматически устанавливает Intelephense, Vue Language Server и Blade Formatter.
 Vue TypeScript Plugin берётся из установленного Vue Language Server.
-Сниппеты PHP, Vue и Blade уже поставляются через LuaSnip и friendly-snippets.
+Сниппеты предоставляет штатная система автодополнения AstroNvim.
 Отступы PHP/Blade — 4 пробела; проектный `.editorconfig` имеет приоритет.
 
 ## Требования проекта
@@ -33,7 +34,7 @@ Vue TypeScript Plugin берётся из установленного Vue Langu
 - **Vue:** настройка рассчитана на Vue 3. Установите зависимости проекта, включая
   Vue и TypeScript для TS-проектов; используйте проектный `tsconfig.json`/`jsconfig.json`.
   Для Vue 2 нужна отдельная настройка Vue Language Tools.
-- **ESLint:** подключается автоматически при наличии конфигурации проекта.
+- **ESLint:** подключается при наличии конфигурации проекта и исправляет ошибки при сохранении.
   Для `.vue` в проекте должен быть настроен `eslint-plugin-vue`.
 
 ## Основные команды
@@ -46,7 +47,7 @@ Vue TypeScript Plugin берётся из установленного Vue Langu
 | `grr` | Найти использования |
 | `K` | Документация символа |
 | `<Space>la` | Действия кода, доступные серверу |
-| `<Space>lf` | Форматирование; при подключённом ESLint — его исправления |
+| `<Space>lf` | Форматирование через Conform и исправления подключённого ESLint |
 | `:ConformInfo` | Проверить выбранный форматтер и его доступность |
 | `:LspInfo` | Проверить серверы: PHP — `intelephense`, Vue — `vue_ls` и `vtsls` |
 | `:Mason` | Посмотреть установленные инструменты |

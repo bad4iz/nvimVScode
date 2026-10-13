@@ -63,6 +63,21 @@ Vue Language Server перезапустите Neovim.
 а не обязательно чат, открытый в соседней вкладке. Изменённые файлы сохраняйте
 перед отправкой — OpenCode читает их с диска.
 
+## Codewars
+
+Плагин `codewars.nvim` позволяет решать ката прямо в Neovim. Для входа выполните
+`:CW cookie` и вставьте `CSRF-TOKEN` и `_session_id` из cookies Codewars в браузере.
+Это секреты сессии: не публикуйте их и не добавляйте в Git.
+
+- `Space kl` — выбрать ката; `Space kf` — подобрать задание.
+- `Space kt` — примерные тесты; `Space ka` — полный набор; `Space ks` — отправить решение.
+- `Space km` — меню; `Space kh` — справка; `Space ki` — диагностика.
+- По умолчанию JavaScript; смена языка: `:CW lang default typescript`.
+- Отдельный запуск: `nvim codewars.nvim`.
+
+Тесты и решения отправляются на Codewars. Исходники решений и cookies сохраняются
+локально вне репозитория, в каталогах данных и кэша Neovim.
+
 ## PHP, Laravel и Vue
 
 [Настройки, требования проекта и проверка](docs/php-laravel-vue.md).

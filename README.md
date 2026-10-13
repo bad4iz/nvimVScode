@@ -21,13 +21,13 @@
   - Standalone Neovim (полная IDE)
 - ⚡ **Быстрый запуск** благодаря lazy.nvim
 - 🎨 **Красивый UI** с tokyonight, lualine, bufferline
-- 🛠️ **Веб-разработка**: React, TypeScript
+- 🛠️ **Веб-разработка**: React, TypeScript, Vue, PHP/Laravel и Blade
 - 🤖 **AI автодополнение** через Supermaven
 - 📁 **Современные плагины** конца 2025 года
 
 ## 📋 Требования
 
-- Neovim >= 0.10.0
+- Neovim >= 0.12.0
 - Git >= 2.19.0
 - [Nerd Font](https://www.nerdfonts.com/) (для иконок)
 - Node.js (для LSP серверов)
@@ -147,6 +147,7 @@ nvim
 | [🎯 Мультикурсор](docs/multicursor.md) | Множественные курсоры и выделения |
 | [🤖 AI автодополнение](docs/ai-completion.md) | Supermaven и AI помощники |
 | [📋 Quickfix](docs/quickfix.md) | Работа со списком ошибок |
+| [🐘 PHP, Laravel и Vue](docs/php-laravel-vue.md) | LSP, Blade, форматирование и требования проекта |
 
 ## 🔌 Переключение Telescope/Snacks.picker
 

@@ -32,20 +32,10 @@ return {
     },
 
     ensure_installed = {
-      -- LSP серверы
-      "vtsls", -- TypeScript/JavaScript LSP (улучшенная версия)
-      "html-lsp",
-      "css-lsp",
-      "json-lsp",
-      "yaml-language-server",
-      "lua-language-server",
-      "eslint-lsp",
-      "emmet-ls",
-      "marksman", -- Markdown LSP
-
-      -- Форматтеры (претиерд быстрее)
+      -- LSP устанавливаются через mason-lspconfig в lsp.lua.
       "prettierd",
       "stylua",
+      "blade-formatter",
     },
   },
 
@@ -54,11 +44,13 @@ return {
 
     -- Автоматически устанавливаем инструменты
     local mr = require("mason-registry")
-    for _, tool in ipairs(opts.ensure_installed or {}) do
-      local p = mr.get_package(tool)
-      if not p:is_installed() then
-        p:install()
+    mr.refresh(function()
+      for _, tool in ipairs(opts.ensure_installed or {}) do
+        local package = mr.get_package(tool)
+        if not package:is_installed() and not package:is_installing() then
+          package:install()
+        end
       end
-    end
+    end)
   end,
 }

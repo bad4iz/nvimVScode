@@ -97,6 +97,10 @@ return {
       "javascript",
       "typescript",
       "tsx",
+      "vue",
+      "php",
+      "php_only", -- PHP внутри Blade-директив и выражений
+      "blade",
       "json",
       "jsonc",
 

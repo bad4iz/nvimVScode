@@ -102,6 +102,27 @@ autocmd("VimResized", {
 -- =====================================================================
 -- НАСТРОЙКИ ДЛЯ КОНКРЕТНЫХ ТИПОВ ФАЙЛОВ
 -- =====================================================================
+vim.filetype.add({
+  pattern = {
+    [".*%.blade%.php"] = "blade",
+  },
+})
+
+autocmd("FileType", {
+  group = augroup("php_settings", { clear = true }),
+  pattern = { "php", "blade" },
+  callback = function()
+    vim.opt_local.expandtab = true
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.tabstop = 4
+    vim.opt_local.softtabstop = 4
+    if vim.bo.filetype == "blade" then
+      vim.opt_local.commentstring = "{{-- %s --}}"
+    end
+  end,
+  desc = "Отступы PHP/Blade и комментарии Blade; .editorconfig имеет приоритет",
+})
+
 autocmd("FileType", {
   group = augroup("filetype_settings", { clear = true }),
   pattern = { "json", "jsonc" },
@@ -158,9 +179,8 @@ autocmd("LspAttach", {
 
     -- -----------------------------------------------------------------
     -- LSP keymaps (AstroNvim style)
-    -- We set them here because in Nvim 0.11 + mason-lspconfig v2 servers
-    -- are enabled via vim.lsp.enable(), so per-server on_attach in our
-    -- old lspconfig setup may never run.
+    -- Общие настройки подключений находятся здесь; конфигурации серверов
+    -- регистрируются через vim.lsp.config() в plugins/lsp/lsp.lua.
     -- -----------------------------------------------------------------
     local map = function(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })

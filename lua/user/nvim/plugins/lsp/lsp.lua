@@ -15,7 +15,7 @@ return {
   dependencies = {
     -- mason.nvim - менеджер для установки LSP серверов, линтеров, форматтеров
     -- Позволяет устанавливать серверы командой :MasonInstall
-    { "williamboman/mason.nvim", config = true },
+    "williamboman/mason.nvim",
 
     -- Мост между mason и lspconfig - автоматически настраивает установленные серверы
     "williamboman/mason-lspconfig.nvim",
@@ -64,167 +64,8 @@ return {
       },
     })
 
-    -- ========================================================================
-    -- Функция, вызываемая при подключении LSP к буферу
-    -- Здесь настраиваются клавиши для работы с LSP
-    -- ========================================================================
-    local on_attach = function(client, bufnr)
-      -- Вспомогательная функция для создания маппингов
-      local map = function(keys, func, desc)
-        vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
-      end
-
-      -- ======================================================================
-      -- Навигация по коду (в стиле AstroNvim)
-      -- ======================================================================
-      -- gd - перейти к определению функции/переменной (где она объявлена)
-      map("gd", vim.lsp.buf.definition, "Перейти к определению")
-
-      -- gD - перейти к объявлению (declaration) - для C/C++ это прототип функции
-      map("gD", vim.lsp.buf.declaration, "Перейти к объявлению")
-
-      -- gri - перейти к реализации интерфейса/абстрактного метода
-      map("gri", vim.lsp.buf.implementation, "Перейти к реализации")
-
-      -- grr - показать все места, где используется символ под курсором
-      map("grr", vim.lsp.buf.references, "Показать использования")
-
-      -- gy - перейти к определению типа переменной
-      map("gy", vim.lsp.buf.type_definition, "Перейти к определению типа")
-
-      -- ======================================================================
-      -- Информация о коде
-      -- ======================================================================
-      -- K - показать документацию для символа под курсором (hover)
-      map("K", vim.lsp.buf.hover, "Показать документацию")
-
-      -- gK или <Leader>lh - показать сигнатуру функции (параметры)
-      map("gK", vim.lsp.buf.signature_help, "Сигнатура функции")
-      map("<Leader>lh", vim.lsp.buf.signature_help, "Сигнатура функции")
-
-      -- ======================================================================
-      -- LSP меню (<Leader>l) - в стиле AstroNvim
-      -- ======================================================================
-      -- <Leader>li - информация о LSP серверах для текущего буфера
-      map("<Leader>li", "<cmd>LspInfo<cr>", "Информация о LSP")
-
-      -- <Leader>lI - информация о Mason (установленные серверы)
-      map("<Leader>lI", "<cmd>Mason<cr>", "Информация о Mason")
-
-      -- <Leader>la - показать доступные действия (исправления, импорты и т.д.)
-      vim.keymap.set({ "n", "v" }, "<Leader>la", function()
-        -- Do not override `context.diagnostics` with an empty list,
-        -- otherwise ESLint quickfix actions (and other diagnostic-based actions) won't show up.
-        vim.lsp.buf.code_action({ context = { only = { "quickfix", "refactor", "source" } } })
-      end, { buffer = bufnr, desc = "LSP: Code Action (действия)" })
-
-      -- <Leader>lA - показать только source actions (организация импортов и т.д.)
-      vim.keymap.set({ "n", "v" }, "<Leader>lA", function()
-        vim.lsp.buf.code_action({ context = { only = { "source" } } })
-      end, { buffer = bufnr, desc = "LSP: Source Action" })
-
-      -- <Leader>lr - переименовать символ во всём проекте
-      map("<Leader>lr", vim.lsp.buf.rename, "Переименовать символ")
-
-      -- <Leader>lR - показать все использования символа
-      map("<Leader>lR", vim.lsp.buf.references, "Поиск использований")
-
-      -- <Leader>lf - отформатировать текущий буфер
-      map("<Leader>lf", function()
-        local ok, conform = pcall(require, "conform")
-        if ok then
-          conform.format({ async = true, lsp_fallback = true })
-        else
-          vim.lsp.buf.format({ async = true })
-        end
-      end, "Форматировать буфер")
-
-      -- ESLint: auto-fix (source.fixAll) on save
-      -- Это именно eslint --fix (правки правил), а не prettier форматирование.
-      if client.name == "eslint" then
-        local group = vim.api.nvim_create_augroup("LspEslintFixAll", { clear = false })
-        vim.api.nvim_clear_autocmds({ group = group, buffer = bufnr })
-        vim.api.nvim_create_autocmd("BufWritePre", {
-          group = group,
-          buffer = bufnr,
-          callback = function()
-            -- Команда добавляется lspconfig'ом для eslint-lsp
-            pcall(vim.cmd, "EslintFixAll")
-          end,
-          desc = "ESLint: Fix all auto-fixable problems",
-        })
-      end
-
-      -- <Leader>ll - обновить CodeLens (если поддерживается)
-      map("<Leader>ll", vim.lsp.codelens.refresh, "Обновить CodeLens")
-
-      -- <Leader>lL - запустить CodeLens
-      map("<Leader>lL", vim.lsp.codelens.run, "Запустить CodeLens")
-
-      -- <Leader>ls - символы в текущем буфере (document symbols)
-      map("<Leader>ls", vim.lsp.buf.document_symbol, "Символы документа")
-
-      -- <Leader>lG - символы во всём проекте (workspace symbols)
-      map("<Leader>lG", vim.lsp.buf.workspace_symbol, "Символы проекта")
-
-      -- <Leader>lS - перезапустить LSP сервер
-      map("<Leader>lS", "<cmd>LspRestart<cr>", "Перезапустить LSP")
-
-      -- ======================================================================
-      -- Диагностика (ошибки и предупреждения)
-      -- ======================================================================
-      -- gl или <Leader>ld - показать диагностику для текущей строки
-      map("<Leader>ld", vim.diagnostic.open_float, "Диагностика строки")
-
-      -- <Leader>lD - показать все ошибки в буфере
-      map("<Leader>lD", "<cmd>Telescope diagnostics bufnr=0<cr>", "Диагностика буфера")
-
-      -- gE - перейти к предыдущей ошибке/предупреждению
-      map("gE", vim.diagnostic.goto_prev, "Предыдущая ошибка или warning")
-
-      -- ge - перейти к следующей ошибке/предупреждению
-      map("ge", vim.diagnostic.goto_next, "Следующая ошибка или warning")
-
-      -- ]e / [e - навигация только по ошибкам (без предупреждений)
-      map("]e", function()
-        vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
-      end, "Следующая ERROR")
-
-      map("[e", function()
-        vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
-      end, "Предыдущая ERROR")
-
-      -- ]w / [w - навигация только по предупреждениям
-      map("]w", function()
-        vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.WARN })
-      end, "Следующий WARN")
-      map("[w", function()
-        vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.WARN })
-      end, "Предыдущий WARN")
-
-      -- <Leader>xq - открыть список ошибок в quickfix
-      map("<Leader>xq", vim.diagnostic.setqflist, "Диагностика в quickfix")
-
-      -- <Leader>xl - открыть список ошибок в loclist
-      map("<Leader>xl", vim.diagnostic.setloclist, "Диагностика в loclist")
-
-      -- Подсветка символа под курсором (если сервер поддерживает)
-      if client.server_capabilities.documentHighlightProvider then
-        local highlight_group = vim.api.nvim_create_augroup("LSPDocumentHighlight", { clear = false })
-        -- При остановке курсора - подсветить все вхождения символа
-        vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-          buffer = bufnr,
-          group = highlight_group,
-          callback = vim.lsp.buf.document_highlight,
-        })
-        -- При движении курсора - убрать подсветку
-        vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-          buffer = bufnr,
-          group = highlight_group,
-          callback = vim.lsp.buf.clear_references,
-        })
-      end
-    end
+    -- Горячие клавиши, подсветка символов и ESLint настраиваются
+    -- единственным обработчиком LspAttach в user/nvim/autocmds.lua.
 
     -- ========================================================================
     -- Настройка возможностей клиента (capabilities)
@@ -267,9 +108,32 @@ return {
         },
       },
 
-      -- TypeScript/JavaScript (vtsls - улучшенная версия от команды Vue)
+      -- PHP / Laravel (работает на Node.js, PHP CLI для LSP не нужен)
+      intelephense = {
+        root_markers = { "composer.json", ".git" },
+      },
+
+      -- Vue: HTML/CSS обслуживает vue_ls, TypeScript внутри SFC — vtsls
+      vue_ls = {},
+
+      -- TypeScript / JavaScript / Vue
       vtsls = {
+        filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
         settings = {
+          vtsls = {
+            tsserver = {
+              globalPlugins = {
+                {
+                  name = "@vue/typescript-plugin",
+                  location = vim.fn.stdpath("data")
+                    .. "/mason/packages/vue-language-server/node_modules/@vue/language-server",
+                  languages = { "vue" },
+                  configNamespace = "typescript",
+                  enableForWorkspaceTypeScriptVersions = true,
+                },
+              },
+            },
+          },
           typescript = {
             -- Подсказки для параметров функций
             inlayHints = {
@@ -385,35 +249,17 @@ return {
     }
 
     -- ========================================================================
-    -- Настройка Mason (менеджер LSP серверов)
+    -- Neovim 0.11: конфигурации нужно зарегистрировать до включения серверов
     -- ========================================================================
-    require("mason").setup({
-      ui = {
-        border = "rounded",
-        icons = {
-          package_installed = "✓",
-          package_pending = "➜",
-          package_uninstalled = "✗",
-        },
-      },
-    })
+    for server_name, server_opts in pairs(servers) do
+      server_opts.capabilities = capabilities
+      vim.lsp.config(server_name, server_opts)
+    end
 
-    -- Автоматическая настройка серверов через mason-lspconfig
+    -- Mason настраивается в mason.lua; здесь только установка и включение LSP.
     require("mason-lspconfig").setup({
-      -- Серверы, которые будут установлены автоматически
       ensure_installed = vim.tbl_keys(servers),
-      -- Автоматически настраивать установленные серверы
-      automatic_installation = true,
-      -- Обработчики для настройки серверов (новый API mason-lspconfig v2)
-      handlers = {
-        -- Обработчик по умолчанию для всех серверов
-        function(server_name)
-          local server_opts = servers[server_name] or {}
-          server_opts.on_attach = on_attach
-          server_opts.capabilities = capabilities
-          require("lspconfig")[server_name].setup(server_opts)
-        end,
-      },
+      automatic_enable = vim.tbl_keys(servers),
     })
 
     -- ========================================================================

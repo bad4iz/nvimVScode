@@ -18,6 +18,8 @@
 Поддерживаемые форматтеры для веб-разработки:
   - prettier    : JS, TS, HTML, CSS, JSON, YAML, MD
   - stylua      : Lua
+  - pint        : PHP (из vendor/bin проекта, при наличии PHP CLI)
+  - blade-formatter : Laravel Blade (работает на Node.js)
 
 GitHub: https://github.com/stevearc/conform.nvim
 =====================================================================
@@ -60,6 +62,10 @@ return {
       -- Vue / Svelte
       vue = { "prettierd" },
       svelte = { "prettierd" },
+
+      -- PHP / Laravel: без доступного Pint используется форматирование LSP.
+      php = { "pint" },
+      blade = { "blade-formatter" },
       
       -- GraphQL
       graphql = { "prettierd" },
@@ -93,8 +99,26 @@ return {
     -- НАСТРОЙКИ ФОРМАТТЕРОВ
     -- ═══════════════════════════════════════════════════════════════
     formatters = {
+      pint = {
+        condition = function()
+          return vim.fn.executable("php") == 1
+        end,
+        cwd = function(_, ctx)
+          return vim.fs.root(ctx.dirname, { "composer.json" })
+        end,
+        require_cwd = true,
+      },
+
       -- Prefer prettierd (installed via Mason), but fall back to local prettier.
       prettierd = {
+        env = function()
+          -- В headless/SSH-сессии XDG_RUNTIME_DIR может указывать на недоступный каталог.
+          local runtime_dir = vim.env.XDG_RUNTIME_DIR
+          if not runtime_dir or vim.fn.filewritable(runtime_dir) ~= 2 then
+            return { XDG_RUNTIME_DIR = vim.fn.stdpath("cache") .. "/prettierd" }
+          end
+          return {}
+        end,
         command = function()
           local prettierd = vim.fn.exepath("prettierd")
           if prettierd and prettierd ~= "" then

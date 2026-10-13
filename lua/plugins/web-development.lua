@@ -18,11 +18,14 @@ local function eslint_fix_all(client, bufnr)
   }, 10000, bufnr)
 end
 
-local function format_buffer()
-  local bufnr = vim.api.nvim_get_current_buf()
+local function fix_eslint(bufnr)
   for _, client in ipairs(vim.lsp.get_clients { bufnr = bufnr, name = "eslint" }) do
     eslint_fix_all(client, bufnr)
   end
+end
+
+local function format_buffer()
+  fix_eslint(vim.api.nvim_get_current_buf())
   require("conform").format { async = true, lsp_format = "fallback" }
 end
 
@@ -96,16 +99,6 @@ return {
         { format_buffer, desc = "Форматирование и исправления ESLint" }
       opts.mappings.v["<Leader>lf"] = { format_selection, desc = "Форматировать выделение" }
       opts.mappings.x["<Leader>lf"] = { format_selection, desc = "Форматировать выделение" }
-      opts.autocmds.eslint_fix_on_save = {
-        cond = function(client) return client.name == "eslint" end,
-        {
-          event = "BufWritePre",
-          desc = "Исправления ESLint при сохранении",
-          callback = function(_, client, bufnr)
-            if require("astrolsp").autoformat_enabled(bufnr) then eslint_fix_all(client, bufnr) end
-          end,
-        },
-      }
     end,
   },
   {
@@ -137,6 +130,8 @@ return {
         if not formatters_by_ft[vim.bo[bufnr].filetype] or not require("astrolsp").autoformat_enabled(bufnr) then
           return
         end
+        -- Один save-hook гарантирует порядок: ESLint, затем форматтер Conform.
+        fix_eslint(bufnr)
         return { timeout_ms = 3000, lsp_format = "fallback" }
       end,
       formatters = {

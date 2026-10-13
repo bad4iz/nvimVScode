@@ -101,7 +101,9 @@ return {
         {
           event = "BufWritePre",
           desc = "Исправления ESLint при сохранении",
-          callback = function(_, client, bufnr) eslint_fix_all(client, bufnr) end,
+          callback = function(_, client, bufnr)
+            if require("astrolsp").autoformat_enabled(bufnr) then eslint_fix_all(client, bufnr) end
+          end,
         },
       }
     end,

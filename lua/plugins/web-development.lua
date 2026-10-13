@@ -26,6 +26,8 @@ local function format_buffer()
   require("conform").format { async = true, lsp_format = "fallback" }
 end
 
+local function format_selection() require("conform").format { async = true, lsp_format = "fallback" } end
+
 return {
   {
     "AstroNvim/astrocore",
@@ -54,7 +56,7 @@ return {
         n = {
           ["<Leader>lf"] = { format_buffer, desc = "Форматирование и исправления ESLint" },
         },
-        x = { ["<Leader>lf"] = { format_buffer, desc = "Форматировать выделение" } },
+        x = { ["<Leader>lf"] = { format_selection, desc = "Форматировать выделение" } },
       },
     },
   },
@@ -90,10 +92,10 @@ return {
         },
         eslint = { settings = { workingDirectories = { mode = "auto" } } },
       })
-      local mapping = { format_buffer, desc = "Форматирование и исправления ESLint" }
-      opts.mappings.n["<Leader>lf"] = mapping
-      opts.mappings.v["<Leader>lf"] = vim.deepcopy(mapping)
-      opts.mappings.x["<Leader>lf"] = vim.deepcopy(mapping)
+      opts.mappings.n["<Leader>lf"] =
+        { format_buffer, desc = "Форматирование и исправления ESLint" }
+      opts.mappings.v["<Leader>lf"] = { format_selection, desc = "Форматировать выделение" }
+      opts.mappings.x["<Leader>lf"] = { format_selection, desc = "Форматировать выделение" }
       opts.autocmds.eslint_fix_on_save = {
         cond = function(client) return client.name == "eslint" end,
         {

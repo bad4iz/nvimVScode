@@ -121,3 +121,15 @@ tsx
 Отрендеренный
 matchedValue
 ifValue
+decisionData
+requestId
+entityName
+camelCase
+queryKey
+ОИВ
+onOk
+reasonError
+reasonLabel
+SelectDateModal
+onClick
+actionName

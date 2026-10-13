@@ -840,29 +840,28 @@ return {
         -- ══════════════════════════════════════════════════════════════
         -- Добавляем action для отправки файлов в OpenCode из любого picker
         Snacks.picker.actions.opencode_send = function(picker)
-          local selected = picker:selected({ fallback = true })
-          if selected and #selected > 0 then
-            local files = {}
-            for _, item in ipairs(selected) do
-              if item.file then
-                table.insert(files, item.file)
-              end
-            end
-            picker:close()
+          if not picker then
+            return
+          end
 
-            -- Открываем OpenCode и переключаемся на ввод
-            require("opencode.core").open({
-              new_session = false,
-              focus = "input", 
-              start_insert = true,
-            })
-
-            -- Добавляем файлы в контекст
-            local context = require("opencode.context")
-            for _, file in ipairs(files) do
-              context.add_file(file)
+          local opencode = require("opencode")
+          local files = {}
+          for _, item in ipairs(picker:selected({ fallback = true })) do
+            if item.file then
+              files[#files + 1] = opencode.format({
+                path = Snacks.picker.util.path(item),
+                from = item.pos,
+                to = item.end_pos,
+              })
             end
           end
+
+          if #files == 0 then
+            return
+          end
+
+          picker:close()
+          opencode.ask(table.concat(files, ", ") .. " ")
         end
       end,
     })

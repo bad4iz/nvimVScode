@@ -89,6 +89,18 @@ return {
     websocket = { display_methods = { "log", "error", "warn", "info", "debug" } },
     runner = { rerun_on_save = true },
   },
+  config = function(_, opts)
+    local inspector = require "consolelog.communication.inspector"
+    local install_formatting = inspector.install_console_formatting
+    inspector.install_console_formatting = function(session)
+      local version = inspector.get_node_version()
+      -- Runtime.evaluate с форматтером util.inspect до старта скрипта
+      -- вызывает SIGABRT в Node 24. Для него используем штатный CDP-preview.
+      if version and version.major == 24 then return false end
+      return install_formatting(session)
+    end
+    require("consolelog").setup(opts)
+  end,
   keys = {
     { "<leader>Lt", "<cmd>ConsoleLogToggle<cr>", desc = "ConsoleLog: включить / выключить" },
     { "<leader>Lr", "<cmd>ConsoleLogRun<cr>", desc = "ConsoleLog: выполнить файл" },

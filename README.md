@@ -48,6 +48,7 @@ Vue Language Server перезапустите Neovim.
 - `lua/plugins/web-development.lua` — PHP/Blade/Vue, LSP и форматирование.
 - `lua/plugins/opencode.lua` — OpenCode V2, хоткеи и `ask_this`.
 - `lua/plugins/snacks.lua` — выбранные файлы picker в вопрос OpenCode.
+- `lua/plugins/testing.lua` — Vitest через Neotest и запуск с покрытием.
 
 Старая структура `lua/user/` больше не используется.
 
@@ -105,6 +106,29 @@ JavaScript требует `node`, Python — `python3`, TypeScript — отде�
 Codi выполняет код локально и пересчитывает его при редактировании. Не включайте
 его в файлах с опасными побочными эффектами: код выполняется повторно. Для
 React/Vue-компонентов используйте приложение с dev-сервером, а не Codi.
+
+## Vitest и покрытие
+
+Открывайте Neovim из корня JS/TS-проекта с установленным `vitest`.
+Для покрытия нужен `@vitest/coverage-v8` той же версии, что и `vitest`
+(либо `@vitest/coverage-istanbul`, если проект использует Istanbul).
+
+Меню тестов — `Space T` (заглавная `T`):
+
+- `Space Tt` — тест под курсором; `Space Tf` — текущий файл; `Space Tp` — весь проект.
+- `Space T Enter` — дерево тестов; `Space To` — вывод теста; `Space TO` — панель вывода.
+- `Space TWf` — включить/выключить watch текущего тестового файла; `Space TWS` — остановить все watches.
+  Для watch откройте тестовый файл и дождитесь подключения JS/TS LSP.
+  При сохранении теста или связанного исходника тесты перезапускаются.
+- `Space Ts` — остановить выполняющиеся тесты текущего файла.
+- `Space TCr` — запустить проект с LCOV-покрытием, включая отчёт при падении тестов.
+- После завершения `Space TCl` — загрузить отчёт и показать покрытие возле строк.
+- `Space TCt` — скрыть/показать покрытие; `Space TCs` — сводка; `Space TCc` — очистить.
+
+По умолчанию читается `coverage/lcov.info`; после первой загрузки изменения
+отчёта подхватываются автоматически. Если проект меняет `coverage.reportsDirectory`,
+укажите соответствующий путь в `nvim-coverage`: `opts.lang.javascript.coverage_file`
+(настройка общая для JavaScript и TypeScript).
 
 ## PHP, Laravel и Vue
 

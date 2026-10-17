@@ -11,4 +11,5 @@ return {
   { import = "astrocommunity.pack.dart" },
   { import = "astrocommunity.test.neotest" },
   { import = "astrocommunity.test.nvim-coverage" },
+  { import = "astrocommunity.utility.noice-nvim" },
 }

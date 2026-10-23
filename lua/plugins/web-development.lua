@@ -77,7 +77,9 @@ return {
         vtsls = {
           filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
           settings = {
+            typescript = { locale = "ru" },
             vtsls = {
+              autoUseWorkspaceTsdk = true,
               tsserver = {
                 globalPlugins = {
                   {

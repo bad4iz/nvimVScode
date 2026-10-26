@@ -28,6 +28,12 @@ end
 local function colors()
   api.nvim_set_hl(0, "JSDocMarkdownBody", { fg = "#819783", italic = true })
   api.nvim_set_hl(0, "JSDocMarkdownTitle", { fg = "#b5a17e", italic = true, bold = true })
+  api.nvim_set_hl(0, "JSDocMarkdownH1", { fg = "#c6b28e", bg = "#2b2930", bold = true, italic = false, nocombine = true })
+  api.nvim_set_hl(0, "JSDocMarkdownH2", { fg = "#8fa9bd", bold = true, italic = false })
+  api.nvim_set_hl(0, "JSDocMarkdownH3", { fg = "#a397ad", bold = false, italic = true })
+  api.nvim_set_hl(0, "JSDocMarkdownH4", { fg = "#8fa9bd", italic = false, bold = false })
+  api.nvim_set_hl(0, "JSDocMarkdownH5", { fg = "#a49ab0", italic = true, bold = false })
+  api.nvim_set_hl(0, "JSDocMarkdownH6", { fg = "#9199a6", italic = true, bold = false })
   api.nvim_set_hl(0, "JSDocMarkdownMarker", { fg = "#50596d" })
   api.nvim_set_hl(0, "JSDocMarkdownCode", { fg = "#8fa9bd", bg = "#252936", italic = false })
 end
@@ -87,8 +93,14 @@ end
 
 local markdown_queries = {
   markdown = [[
-    (atx_heading) @title
-    (setext_heading) @title
+    (atx_heading (atx_h1_marker)) @h1
+    (atx_heading (atx_h2_marker)) @h2
+    (atx_heading (atx_h3_marker)) @h3
+    (atx_heading (atx_h4_marker)) @h4
+    (atx_heading (atx_h5_marker)) @h5
+    (atx_heading (atx_h6_marker)) @h6
+    (setext_heading (setext_h1_underline)) @h1
+    (setext_heading (setext_h2_underline)) @h2
     [(atx_h1_marker) (atx_h2_marker) (atx_h3_marker)
      (atx_h4_marker) (atx_h5_marker) (atx_h6_marker)
      (setext_h1_underline) (setext_h2_underline)] @marker
@@ -101,7 +113,18 @@ local markdown_queries = {
     [(emphasis_delimiter) (code_span_delimiter)] @marker
   ]],
 }
-local styles = { title = { "Title", 120 }, code = { "Code", 130 }, marker = { "Marker", 140 } }
+local styles = {
+  title = { "Title", 120 },
+  -- Explicit headings override the summary and strong emphasis, but not inline code.
+  h1 = { "H1", 125 },
+  h2 = { "H2", 125 },
+  h3 = { "H3", 125 },
+  h4 = { "H4", 125 },
+  h5 = { "H5", 125 },
+  h6 = { "H6", 125 },
+  code = { "Code", 130 },
+  marker = { "Marker", 140 },
+}
 
 local function highlight_comment(buf, node)
   local source, mapping = clean_comment(buf, node)

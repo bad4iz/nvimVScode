@@ -91,6 +91,27 @@ local function mark_node(buf, node, mapping, group, priority)
   end
 end
 
+local function indent_heading(buf, node, mapping, level)
+  if level == 1 then return end
+  local content = node:field("heading_content")[1]
+  if not content then return end
+  local sr, sc, er, ec = content:range()
+  -- Use content ranges so setext underlines and ATX markers keep their positions.
+  for row = sr, er do
+    local line = mapping[row + 1]
+    local first = row == sr and sc or 0
+    local last = row == er and ec or (line and line.length or 0)
+    if line and not line.tag and last > first then
+      api.nvim_buf_set_extmark(buf, namespace, line.row, line.col + first, {
+        virt_text = { { string.rep(" ", 2 * (level - 1)), "JSDocMarkdownBody" } },
+        virt_text_pos = "inline",
+        priority = 225,
+        right_gravity = false,
+      })
+    end
+  end
+end
+
 local markdown_queries = {
   markdown = [[
     (atx_heading (atx_h1_marker)) @h1
@@ -143,8 +164,11 @@ local function highlight_comment(buf, node)
     queries[language] = queries[language] or vim.treesitter.query.parse(language, markdown_queries[language])
     local query = queries[language]
     for id, capture in query:iter_captures(tree:root(), source) do
-      local style = styles[query.captures[id]]
+      local name = query.captures[id]
+      local style = styles[name]
       mark_node(buf, capture, mapping, style[1], style[2])
+      local level = tonumber(name:match "^h([1-6])$")
+      if level then indent_heading(buf, capture, mapping, level) end
     end
   end)
 end

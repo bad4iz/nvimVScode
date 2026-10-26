@@ -29,7 +29,7 @@ local function colors()
   api.nvim_set_hl(0, "JSDocMarkdownBody", { fg = "#819783", italic = true })
   api.nvim_set_hl(0, "JSDocMarkdownTitle", { fg = "#b5a17e", italic = true, bold = true })
   api.nvim_set_hl(0, "JSDocMarkdownMarker", { fg = "#50596d" })
-  api.nvim_set_hl(0, "JSDocMarkdownCode", { fg = "#91a3a0", italic = true })
+  api.nvim_set_hl(0, "JSDocMarkdownCode", { fg = "#8fa9bd", bg = "#252936", italic = false })
 end
 
 local function mark(buf, row, first, last, group, priority, conceal)

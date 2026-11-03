@@ -35,7 +35,7 @@ https://github.com/chriswritescode-dev/consolelog.nvim
 
 Быстрый старт:
   JS/Python: сохрани файл с console.log(...) / print(...), нажми <Space>Lr.
-  Браузер: открой JS/TS-файл проекта — захват включится автоматически. Запусти
+  Браузер: открой JS/TS-файл проекта и включи захват через <Space>Lt. Запусти
   dev-сервер (например, npm run dev), открой приложение в браузере и вызови лог.
   Если вывода нет — проверь :ConsoleLogStatus и source maps.
 
@@ -46,7 +46,7 @@ https://github.com/chriswritescode-dev/consolelog.nvim
     генерации JS (например, enum), не поддерживаются. JSX/TSX — через dev-сервер.
   • Python >= 3.8, без внешних пакетов. Интерпретатор: настройка
     runner.python_executable → VIRTUAL_ENV → ближайшая .venv/venv → python3.
-  • Захват включается автоматически для поддерживаемых буферов; браузерный
+  • Захват по умолчанию выключен, включается через <Space>Lt; браузерный
     захват внедряет клиент в проект. Используй только для локальной разработки
     и проверяй git diff проекта. <Space>Lt отключает захват.
   • После :ConsoleLogRun сохранение повторно ВЫПОЛНЯЕТ скрипт, включая его
@@ -82,7 +82,7 @@ return {
     "ConsoleLogExplainStop",
   },
   opts = {
-    auto_enable = true,
+    auto_enable = false,
     log_level = "warn",
     keymaps = { enabled = false },
     display = { max_width = 100 },

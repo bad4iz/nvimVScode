@@ -17,7 +17,7 @@
   ]t          - следующий todo
   [t          - предыдущий todo
   <leader>xt  - список всех todo (Trouble)
-  <leader>xT  - todo текущего буфера
+  <leader>xT  - только TODO/FIX/FIXME (Trouble)
 
 GitHub: https://github.com/folke/todo-comments.nvim
 =====================================================================

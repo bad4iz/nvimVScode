@@ -13,7 +13,7 @@ return {
           wrap = true,
           multi_window = false,
         },
-        label = { min_pattern_length = 2 },
+        label = { min_pattern_length = 1 },
         jump = { autojump = false },
       },
     },
@@ -23,7 +23,7 @@ return {
       "f",
       function() require("flash").jump { mode = "two_char", search = { forward = true } } end,
       mode = { "n", "x", "o" },
-      desc = "Flash: два символа по всему окну",
+      desc = "Flash: поиск по окну, метки после первого символа",
     },
     {
       "t",

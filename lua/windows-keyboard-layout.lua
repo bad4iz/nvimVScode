@@ -9,6 +9,13 @@ local flag_opacity = 1
 local badge_offset = { columns = 0, rows = 2 }
 
 local function hide_badge()
+  if state.use_float then
+    if state.flag_window and api.nvim_win_is_valid(state.flag_window) then
+      api.nvim_win_close(state.flag_window, true)
+    end
+    state.flag_window, state.image_row, state.image_col = nil, nil, nil
+    return
+  end
   if not state.image_row then return end
   state.image_row, state.image_col = nil, nil
   -- Raster pixels are outside Nvim's cell cache. Repaint instead of erasing
@@ -37,19 +44,58 @@ local function usable()
     and vim.bo.buftype ~= "terminal"
 end
 
+local function render_float(row, col)
+  if not state.flag_buffer or not api.nvim_buf_is_valid(state.flag_buffer) then
+    state.flag_buffer = api.nvim_create_buf(false, true)
+    api.nvim_buf_set_lines(state.flag_buffer, 0, -1, false, { "▀▀", "▀▀" })
+    vim.bo[state.flag_buffer].modifiable = false
+    local namespace = api.nvim_create_namespace "WindowsKeyboardLayoutFlag"
+    for index, stripe in ipairs { "Top", "Bottom" } do
+      api.nvim_buf_set_extmark(state.flag_buffer, namespace, index - 1, 0, {
+        end_col = #"▀▀",
+        hl_group = "WindowsKeyboardFlag" .. stripe,
+      })
+    end
+  end
+  local config = {
+    relative = "editor",
+    row = row,
+    col = col,
+    width = flag_width,
+    height = flag_height,
+    border = "none",
+    style = "minimal",
+    focusable = false,
+    mouse = false,
+    noautocmd = true,
+    zindex = 40,
+  }
+  if state.flag_window and api.nvim_win_is_valid(state.flag_window) then
+    api.nvim_win_set_config(state.flag_window, config)
+  else
+    state.flag_window = api.nvim_open_win(state.flag_buffer, false, config)
+    vim.wo[state.flag_window].winblend = 0
+    vim.wo[state.flag_window].wrap = false
+  end
+end
+
 local function render()
   if not state.active or not state.terminal or not state.russian or not usable() then
     hide_badge()
     restore_color()
     return
   end
-  -- Mode changes and Terminal settings reloads can overwrite an OSC cursor color.
-  api.nvim_ui_send("\27]12;" .. russian_blue .. "\7")
-  state.colored = true
+  -- Zellij does not implement OSC 12; keep cursor coloring for direct terminals.
+  if not state.use_float then
+    api.nvim_ui_send("\27]12;" .. russian_blue .. "\7")
+    state.colored = true
+  end
   if vim.fn.pumvisible() ~= 0 or api.nvim_win_get_config(0).relative ~= "" then
     hide_badge()
     return
   end
+  -- Check the underlying cells, not the spaces painted by our own window.
+  if state.use_float then hide_badge() end
   vim.cmd.redraw()
   local position = vim.fn.screenpos(0, vim.fn.line ".", vim.fn.col ".")
   if position.row == 0 then
@@ -84,10 +130,14 @@ local function render()
     return
   end
   if state.image_row ~= row or state.image_col ~= col then hide_badge() end
-  api.nvim_ui_send("\27]12;" .. russian_blue .. "\7")
   -- A full repaint may reveal diagnostics that were pending during the first check.
   if not available(col) then return end
-  api.nvim_ui_send(string.format("\0277\27[%d;%dH%s\0278", row + 1, col + 1, state.flag_sixel))
+  if state.use_float then
+    render_float(row, col)
+  else
+    api.nvim_ui_send("\27]12;" .. russian_blue .. "\7")
+    api.nvim_ui_send(string.format("\0277\27[%d;%dH%s\0278", row + 1, col + 1, state.flag_sixel))
+  end
   state.image_row, state.image_col = row, col
 end
 
@@ -125,7 +175,8 @@ function M.status()
     active = state.active,
     colored = state.colored,
     badge = state.image_row ~= nil,
-    image = state.image_row ~= nil,
+    image = not state.use_float and state.image_row ~= nil,
+    backend = state.use_float and "float" or "sixel",
     helper_running = state.job > 0,
     error = state.error,
   }
@@ -135,6 +186,9 @@ function M.stop()
   if not state then return end
   pause()
   state.timer:close()
+  if state.flag_buffer and api.nvim_buf_is_valid(state.flag_buffer) then
+    api.nvim_buf_delete(state.flag_buffer, { force = true })
+  end
   if state.job > 0 then
     -- EOF lets PowerShell exit cleanly, including when Neovim is reconfigured.
     pcall(vim.fn.chanclose, state.job, "stdin")
@@ -150,6 +204,7 @@ function M.setup()
   if vim.fn.filereadable(helper) ~= 1 then return end
   local script = table.concat(vim.fn.readfile(helper), "\n")
   state = {
+    use_float = vim.env.ZELLIJ ~= nil and vim.env.ZELLIJ ~= "",
     active = false,
     terminal = false,
     russian = false,
@@ -180,6 +235,8 @@ function M.setup()
       return result
     end
     local white, blue, red = faded(0xFFFFFF), faded(0x0039A6), faded(0xD52B1E)
+    api.nvim_set_hl(0, "WindowsKeyboardFlagTop", { fg = white, bg = blue })
+    api.nvim_set_hl(0, "WindowsKeyboardFlagBottom", { fg = red, bg = background })
     state.background = background
     local function palette(index, color)
       local channels = {}
@@ -197,15 +254,17 @@ function M.setup()
       .. "-#0!20o-#0!20N$#1!20o-#1!20N$#2!20o-#2!20B\27\\"
   end
   highlights()
-  api.nvim_create_autocmd("TermResponse", {
-    group = state.group,
-    callback = function(event)
-      local response = event.data and event.data.sequence or vim.v.termresponse
-      local color = response and response:match "^\27%]12;(rgb:[%x]+/[%x]+/[%x]+)"
-      if color and not state.original_color then state.original_color = color end
-    end,
-  })
-  api.nvim_ui_send "\27]12;?\7"
+  if not state.use_float then
+    api.nvim_create_autocmd("TermResponse", {
+      group = state.group,
+      callback = function(event)
+        local response = event.data and event.data.sequence or vim.v.termresponse
+        local color = response and response:match "^\27%]12;(rgb:[%x]+/[%x]+/[%x]+)"
+        if color and not state.original_color then state.original_color = color end
+      end,
+    })
+    api.nvim_ui_send "\27]12;?\7"
+  end
   state.job = vim.fn.jobstart({
     powershell,
     "-NoLogo",

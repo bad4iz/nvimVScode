@@ -107,6 +107,7 @@ Vue Language Server перезапустите Neovim.
 `:CW cookie` и вставьте `CSRF-TOKEN` и `_session_id` из cookies Codewars в браузере.
 Это секреты сессии: не публикуйте их и не добавляйте в Git.
 
+- `k` на стартовом экране — открыть меню Codewars (`:CW`).
 - `Space kl` — выбрать ката; `Space kf` — подобрать задание.
 - `Space kr` / `:CWPractice` — разминка: список 8–7 kyu в случайном порядке.
   В меню: `Katas` → `Warm-up 8/7 kyu (shuffle)` (клавиши `k`, затем `r` без Space).

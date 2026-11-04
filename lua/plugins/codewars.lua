@@ -12,6 +12,18 @@
 
 local function open_practice() vim.cmd "CW list difficulty=8,7 order=shuffle" end
 
+local function train_from_clipboard()
+  local url = vim.trim(vim.fn.getreg "+")
+  local path = url:match("^https?://www%.codewars%.com/kata/(%S+)$") or url:match("^https?://codewars%.com/kata/(%S+)$")
+  local kata = path and path:match("^([%w%-]+)")
+  if not kata then
+    vim.notify("Скопируй ссылку на кату Codewars", vim.log.levels.WARN)
+    return
+  end
+  local lang = path:match("^[%w%-]+/train/([%w%-]+)")
+  vim.api.nvim_cmd({ cmd = "CW", args = { "train", kata, lang } }, {})
+end
+
 ---@type LazySpec
 return {
   "prosk-sudo/codewars.nvim",
@@ -60,6 +72,7 @@ return {
   keys = {
     { "<leader>k", desc = "Codewars" },
     { "<leader>km", "<cmd>CW<cr>", desc = "Codewars: меню" },
+    { "<leader>ku", train_from_clipboard, desc = "Codewars: открыть ссылку из буфера обмена" },
     { "<leader>kl", "<cmd>CW list<cr>", desc = "Codewars: список ката" },
     { "<leader>kr", open_practice, desc = "Codewars: разминка 8–7 kyu (shuffle)" },
     { "<leader>kR", "<cmd>CWResume<cr>", desc = "Codewars: продолжить последнюю кату" },
